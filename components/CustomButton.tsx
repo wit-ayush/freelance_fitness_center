@@ -1,14 +1,19 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 
-const CustomButton = ({ onClick, title, textColor, colors }) => {
+const CustomButton = ({
+  onClick,
+  title,
+  textColor,
+  colors = ["#4c669f", "#3b5998", "#192f6a"],
+  iconSource = null,
+}) => {
   return (
     <TouchableOpacity
       style={{
         alignSelf: "center",
         width: "100%",
-        borderColor: "#fff",
       }}
       onPress={onClick}
     >
@@ -21,14 +26,20 @@ const CustomButton = ({ onClick, title, textColor, colors }) => {
           width: "90%",
           borderRadius: 10,
           alignSelf: "center",
+          borderColor: "grey",
+          borderWidth: 0.2,
+          flexDirection: "row",
         }}
       >
+        {iconSource && (
+          <Image style={{ marginRight: 20 }} source={iconSource} />
+        )}
         <Text
           style={{
             color: textColor,
-            fontSize: 20,
+            fontSize: 18,
             textAlign: "center",
-            fontWeight: "bold",
+            fontWeight: "600",
           }}
         >
           {title}
