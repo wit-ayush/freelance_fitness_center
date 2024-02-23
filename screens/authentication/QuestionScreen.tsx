@@ -26,7 +26,7 @@ const QuestionScreen = ({ navigation }) => {
       </Text>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate(screens.Signup);
+          navigation.navigate(screens.Signup); //  for now later just incremenat the counter
         }}
       >
         <Text

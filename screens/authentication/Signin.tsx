@@ -7,19 +7,39 @@ import {
   View,
   Platform,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import { images, screens } from "../../utils/constants";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../utils/firebase";
+import { auth, db } from "../../utils/firebase";
 import { AppContext } from "../../context/AppContext";
 import * as AppleAuthentication from "expo-apple-authentication";
+import { doc, getDoc } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Signin = ({ navigation }) => {
   const { appUser, setappUser } = useContext(AppContext);
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
+
+  const saveCookie = async () => {
+    try {
+      const jsonValue = JSON.stringify(appUser);
+      await AsyncStorage.setItem("user", jsonValue);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    if (appUser) {
+      console.log("User Found and logged in", appUser);
+      saveCookie();
+      navigation.navigate("HomeStack");
+    }
+  }, [appUser]);
+
   return (
     <SafeAreaView>
       <View
@@ -43,6 +63,7 @@ const Signin = ({ navigation }) => {
           placeholder={"Enter Email"}
           value={email}
           onChangeText={setemail}
+          type="email-address"
         />
         <CustomInput
           label={"Password"}
@@ -55,13 +76,34 @@ const Signin = ({ navigation }) => {
             await signInWithEmailAndPassword(auth, email, password)
               .then(async (userCredential) => {
                 const user = userCredential.user;
-                await setappUser(user);
-                await console.log("User Found and logged inn", appUser);
+                if (email == "trainer@gmail.com") {
+                  const docRef = doc(db, "trainers", "khush");
+                  const docSnap = await getDoc(docRef);
+
+                  if (docSnap.exists()) {
+                    await setappUser(docSnap.data());
+                    console.log("Document data:", docSnap.data());
+                  } else {
+                    // docSnap.data() will be undefined in this case
+                    console.log("No such document!");
+                  }
+                } else {
+                  const docRef = doc(db, "users", email);
+                  const docSnap = await getDoc(docRef);
+
+                  if (docSnap.exists()) {
+                    await setappUser(docSnap.data());
+                    console.log("Document data:", docSnap.data());
+                  } else {
+                    // docSnap.data() will be undefined in this case
+                    console.log("No such document!");
+                  }
+                }
               })
               .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                console.log(appUser);
+                console.log(errorMessage);
               });
           }}
           title={"Sign in"}

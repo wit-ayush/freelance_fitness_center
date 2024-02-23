@@ -1,14 +1,39 @@
 import { ActivityIndicator, Image, StyleSheet, Text, View } from "react-native";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { BallIndicator } from "react-native-indicators";
 import { useNavigation } from "@react-navigation/native";
 import { screens } from "../../utils/constants";
+import { AppContext } from "../../context/AppContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SplashScreen = ({ navigation }) => {
+  const { appuser, setappUser } = useContext(AppContext);
+
+  const checkUser = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("user");
+
+      if (jsonValue) {
+        setappUser(JSON.parse(jsonValue));
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  };
+
   useEffect(() => {
+    checkUser();
+
     setTimeout(() => {
-      navigation.navigate(screens.AuthScreen);
-    }, 2000);
+      if (appuser && appuser?.name) {
+        navigation.navigate("HomeStack");
+      } else {
+        navigation.navigate(screens.AuthScreen);
+      }
+    }, 3000);
   }, []);
 
   return (

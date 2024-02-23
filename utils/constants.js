@@ -5,6 +5,8 @@ export const screens = {
   Signup: "Signup",
   Signin: "Signin",
   HomeScreen: "HomeScreen",
+  Inbox: "InboxScreen",
+  ChatScreen: "ChatScreen",
 };
 
 export const images = {

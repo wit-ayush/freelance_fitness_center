@@ -16,8 +16,9 @@ import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { images, screens } from "../../utils/constants";
-import { auth } from "../../utils/firebase";
+import { auth, db } from "../../utils/firebase";
 import * as AppleAuthentication from "expo-apple-authentication";
+import { collection, addDoc, doc, setDoc, getDoc } from "firebase/firestore";
 
 const Signup = ({ navigation }) => {
   const [name, setname] = useState("");
@@ -25,34 +26,50 @@ const Signup = ({ navigation }) => {
   const [password, setpassword] = useState("");
   const [confirmPassword, setconfirmPassword] = useState("");
 
+  const addUserToDatabase = async () => {
+    const userDockRef = doc(db, "users", email);
+    try {
+      await setDoc(userDockRef, {
+        name,
+        email,
+      });
+      console.log("Document written with ID: ", userDockRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
+
   const handleSignup = async () => {
-    navigation.navigate("HomeStack");
-    // if (confirmPassword != password) {
-    //   Alert.alert("Passwords donot match", "");
-    // }
-    // if (
-    //   name &&
-    //   email &&
-    //   password &&
-    //   confirmPassword &&
-    //   password == confirmPassword
-    // ) {
-    //   console.log(name, email, password);
-    //   await createUserWithEmailAndPassword(auth, email, password)
-    //     .then((userCredential) => {
-    //       console.log("account created");
-    //       const user = userCredential.user;
-    //       console.log(user);
-    //     })
-    //     .catch((error) => {
-    //       const errorCode = error.code;
-    //       const errorMessage = error.message;
-    //       alert(error.message);
-    //     });
-    // } else {
-    //   Alert.alert("Invalid Credentials", "Complete all fields to continue");
-    //   return;
-    // }
+    if (confirmPassword != password) {
+      Alert.alert("Passwords donot match", "");
+    }
+    if (
+      name &&
+      email &&
+      password &&
+      confirmPassword &&
+      password == confirmPassword
+    ) {
+      console.log(name, email, password);
+      await createUserWithEmailAndPassword(auth, email, password)
+        .then(async (userCredential) => {
+          console.log("account created");
+          const user = userCredential.user;
+          console.log(user);
+          if (user) {
+            await addUserToDatabase();
+          }
+        })
+
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          alert(error.message);
+        });
+    } else {
+      Alert.alert("Invalid Credentials", "Complete all fields to continue");
+      return;
+    }
   };
 
   return (
