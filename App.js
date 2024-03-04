@@ -6,9 +6,29 @@ import SplashScreen from "./screens/authentication/SplashScreen";
 import AuthStack from "./screens/authentication/AuthStack";
 import AppProvider from "./context/AppContext";
 import HomeStack from "./screens/home/HomeStack";
+import { ClerkProvider } from "@clerk/clerk-expo";
+import { useAuth } from "@clerk/clerk-expo";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
+
+  const tokenCache = {
+    async getToken(key) {
+      try {
+        return SecureStore.getItemAsync(key);
+      } catch (err) {
+        return null;
+      }
+    },
+    async saveToken(key, value) {
+      try {
+        return SecureStore.setItemAsync(key, value);
+      } catch (err) {
+        return;
+      }
+    },
+  };
+
   return (
     <AppProvider>
       <NavigationContainer>

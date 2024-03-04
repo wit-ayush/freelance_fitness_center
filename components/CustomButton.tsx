@@ -27,7 +27,7 @@ const CustomButton = ({
           borderRadius: 10,
           alignSelf: "center",
           borderColor: "grey",
-          borderWidth: 0.2,
+          borderWidth: 1,
           flexDirection: "row",
         }}
       >

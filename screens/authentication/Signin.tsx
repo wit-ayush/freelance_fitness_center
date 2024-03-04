@@ -76,28 +76,15 @@ const Signin = ({ navigation }) => {
             await signInWithEmailAndPassword(auth, email, password)
               .then(async (userCredential) => {
                 const user = userCredential.user;
-                if (email == "trainer@gmail.com") {
-                  const docRef = doc(db, "trainers", "khush");
-                  const docSnap = await getDoc(docRef);
+                const docRef = doc(db, "users", email);
+                const docSnap = await getDoc(docRef);
 
-                  if (docSnap.exists()) {
-                    await setappUser(docSnap.data());
-                    console.log("Document data:", docSnap.data());
-                  } else {
-                    // docSnap.data() will be undefined in this case
-                    console.log("No such document!");
-                  }
+                if (docSnap.exists()) {
+                  await setappUser(docSnap.data());
+                  console.log("Document data:", docSnap.data());
                 } else {
-                  const docRef = doc(db, "users", email);
-                  const docSnap = await getDoc(docRef);
-
-                  if (docSnap.exists()) {
-                    await setappUser(docSnap.data());
-                    console.log("Document data:", docSnap.data());
-                  } else {
-                    // docSnap.data() will be undefined in this case
-                    console.log("No such document!");
-                  }
+                  // docSnap.data() will be undefined in this case
+                  console.log("No such document!");
                 }
               })
               .catch((error) => {
@@ -153,6 +140,7 @@ const Signin = ({ navigation }) => {
         </TouchableOpacity>
         <View style={{ marginTop: 20 }}>
           <Text style={{ textAlign: "center" }}>Or continue with</Text>
+          {/* <SignInWithOAuth /> */}
           <CustomButton
             onClick={undefined}
             title={"Sign up with Google"}

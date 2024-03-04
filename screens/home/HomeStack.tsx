@@ -5,6 +5,7 @@ import { screens } from "../../utils/constants";
 import HomeScreen from "./HomeScreen";
 import Inbox from "./Inbox";
 import ChatScreen from "./ChatScreen";
+import DiaryScreen from "./DiaryScreen";
 
 const HomeStack = () => {
   const Stack = createNativeStackNavigator();
@@ -24,6 +25,11 @@ const HomeStack = () => {
       <Stack.Screen
         name={screens.ChatScreen}
         component={ChatScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name={screens.Diary}
+        component={DiaryScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

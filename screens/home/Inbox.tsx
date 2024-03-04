@@ -114,7 +114,7 @@ const Inbox = ({ navigation }) => {
               />
             );
           })} */}
-        {!appUser?.isTrainer && (
+        {appUser?.isTrainer && (
           <ChatBox
             sender={appUser}
             navigation={navigation}

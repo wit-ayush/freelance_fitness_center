@@ -5,35 +5,49 @@ import { useNavigation } from "@react-navigation/native";
 import { screens } from "../../utils/constants";
 import { AppContext } from "../../context/AppContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../utils/firebase";
 
 const SplashScreen = ({ navigation }) => {
-  const { appuser, setappUser } = useContext(AppContext);
+  const { appUser, setappUser } = useContext(AppContext);
+
+  const getUser = async () => {
+    if (appUser) {
+      const docRef = doc(db, "users", appUser?.email);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        await setappUser(docSnap.data());
+      }
+    }
+  };
 
   const checkUser = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem("user");
+    setTimeout(async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem("user");
 
-      if (jsonValue) {
-        setappUser(JSON.parse(jsonValue));
-        return true;
+        if (jsonValue) {
+          setappUser(JSON.parse(jsonValue));
+          await getUser();
+
+          await console.log("From Splash", jsonValue);
+          navigation.navigate("HomeStack");
+
+          return true;
+        }
+
+        navigation.navigate(screens.AuthScreen);
+        return false;
+      } catch (e) {
+        console.log(e);
+        return false;
       }
-      return false;
-    } catch (e) {
-      console.log(e);
-      return false;
-    }
+    }, 3000);
   };
 
   useEffect(() => {
     checkUser();
-
-    setTimeout(() => {
-      if (appuser && appuser?.name) {
-        navigation.navigate("HomeStack");
-      } else {
-        navigation.navigate(screens.AuthScreen);
-      }
-    }, 3000);
   }, []);
 
   return (

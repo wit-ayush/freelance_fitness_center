@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import React, { createContext, useState, useEffect } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../utils/firebase";
 
 export const AppContext = createContext();
 
@@ -7,6 +9,17 @@ const AppProvider = ({ children }) => {
   const [appUser, setappUser] = useState(null);
   const [isTrainer, setisTrainer] = useState("");
   const [trainerData, settrainerData] = useState();
+
+  const getUser = async () => {
+    if (appUser) {
+      const docRef = doc(db, "users", appUser?.email);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        await setappUser(docSnap.data());
+      }
+    }
+  };
 
   const checkTrainer = async () => {
     console.log(appUser.trainer);
@@ -34,14 +47,18 @@ const AppProvider = ({ children }) => {
       setisTrainer(true);
     }
   };
-  useEffect(() => {
-    checkTrainer();
-    console.log(isTrainer);
-  }, [isTrainer]);
+  useEffect(() => {}, []);
 
   return (
     <AppContext.Provider
-      value={{ appUser, setappUser, isTrainer, trainerData, checkTrainer }}
+      value={{
+        appUser,
+        setappUser,
+        isTrainer,
+        trainerData,
+        checkTrainer,
+        getUser,
+      }}
     >
       {children}
     </AppContext.Provider>
