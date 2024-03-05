@@ -14,6 +14,7 @@ export const screens = {
   PlanScreen: "PlanScreen",
   UserProfile: "UserProfile",
   TrainerHome: "TrainerHome",
+  ExerciseSearch: "ExerciseSearch",
 };
 
 export const images = {
@@ -21,27 +22,41 @@ export const images = {
   profileImage: require("../assets/images/avatar.png"),
   homeIcon: require("../assets/icons/homeIcon.png"),
   diary: require("../assets/icons/diary.png"),
+  dumbell: require("../assets/images/dumbell.png"),
 };
 
 export const logWorkouts = [
-  { label: "Chest", value: "1" },
-  { label: "Biceps", value: "2" },
-  { label: "Back", value: "3" },
-  { label: "Triceps", value: "4" },
-  { label: "Legs", value: "5" },
+  { label: "Chest", value: "Chest" },
+  { label: "Biceps", value: "Biceps" },
+  { label: "Back", value: "Back" },
+  { label: "Triceps", value: "Triceps" },
+  { label: "Legs", value: "Legs" },
 ];
 
-export const getTrainerUsers = async (arraySetter) => {
-  const q = query(
-    collection(db, "users"),
-    where("trainer", "==", "trainer@gmail.com")
-  );
-  const querySnapshot = await getDocs(q);
-  const users = [];
-  querySnapshot.forEach((doc) => {
-    // doc.data() is never undefined for query doc snapshots
-    console.log(doc.id, " => ", doc.data());
-    users.push(doc.data());
+export function getChatTimeFormat() {
+  const now = new Date();
+
+  const hours = now.getHours().toString().padStart(2, "0");
+  const minutes = now.getMinutes().toString().padStart(2, "0");
+
+  const currentTime = `${hours}:${minutes}`;
+
+  return currentTime;
+}
+
+export const getBlobFroUri = async (uri) => {
+  const blob = await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      resolve(xhr.response);
+    };
+    xhr.onerror = function (e) {
+      reject(new TypeError("Network request failed"));
+    };
+    xhr.responseType = "blob";
+    xhr.open("GET", uri, true);
+    xhr.send(null);
   });
-  await arraySetter(users);
+
+  return blob;
 };

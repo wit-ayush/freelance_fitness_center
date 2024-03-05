@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CalendarStrip from "react-native-calendar-strip";
 import CustomFloatingButton from "../CustomFloatingButton";
 import DiaryEntryModal from "./DiaryEntryModal";
@@ -15,10 +15,33 @@ import moment, { Moment } from "moment";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Progress from "react-native-progress";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../utils/firebase";
+import { AppContext } from "../../context/AppContext";
 
 const DiaryLog = ({ navigation }) => {
   const [isModalVisible, setModalVisible] = useState<boolean>(false);
   const [dateTapped, setdateTapped] = useState<Date>(new Date());
+
+  const [userWorkoutLog, setuserWorkoutLog] = useState([]);
+
+  const { appUser } = useContext(AppContext);
+
+  useEffect(() => {
+    getAllWorkoutLogs();
+  }, []);
+  // console.log(dateTapped.toDateString());
+
+  const getAllWorkoutLogs = async () => {
+    const workoutLogs = [];
+    const query = collection(db, `workoutlogs/${appUser?.email}/logs`);
+    const querySnapshot = await getDocs(query);
+    querySnapshot.forEach(async (doc) => {
+      await workoutLogs.push(doc.data());
+    });
+    setuserWorkoutLog(workoutLogs);
+    console.log(workoutLogs);
+  };
 
   const LogComponent = () => {
     return (
@@ -151,6 +174,7 @@ const DiaryLog = ({ navigation }) => {
             height: 70,
             backgroundColor: "lightblue",
           }}
+          maxDate={new Date()}
           selectedDate={dateTapped}
           calendarHeaderPosition="below"
           calendarHeaderStyle={{ textAlign: "left" }}
@@ -159,21 +183,25 @@ const DiaryLog = ({ navigation }) => {
           calendarAnimation={{ type: "sequence", duration: 1000 / 4 }}
           onDateSelected={(date) => {
             setdateTapped(date.toDate());
-            // markedDatesArray.push({
-            //   date: date.toDate(),
-            //   dots: [
-            //     {
-            //       color: "#000",
-            //       selectedColor: "#000",
-            //     },
-            //   ],
-            // });
-            // markedDatesArray.forEach((item) => {
-            //   console.log(item.date.toDateString());
-            // });
+            console.log(dateTapped.toDateString());
+            markedDatesArray.push({
+              date: date.toDate(),
+              dots: [
+                {
+                  color: "#000",
+                  selectedColor: "#000",
+                },
+              ],
+            });
+            markedDatesArray.forEach((item) => {
+              console.log(item.date.toDateString());
+            });
           }}
         />
       </View>
+      <Text style={{ textAlign: "center", marginTop: 5, fontWeight: "bold" }}>
+        {dateTapped.toDateString()}
+      </Text>
       <View style={styles.horizontalLine} />
 
       <View>
@@ -193,12 +221,29 @@ const DiaryLog = ({ navigation }) => {
           </Text>
         </View>
         <ScrollView style={{ height: "100%" }}>
-          <LogComponent />
-          <LogComponent />
-          <LogComponent />
-          <LogComponent />
-          <LogComponent />
-          <LogComponent />
+          {userWorkoutLog &&
+            userWorkoutLog.map((data, i) => {
+              if (dateTapped.toDateString() == data.dateSelect) {
+                return <LogComponent key={i} />;
+              }
+              return (
+                <View
+                  style={{ height: "100%", justifyContent: "center" }}
+                  key={i}
+                >
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      fontWeight: "bold",
+                      fontSize: 18,
+                    }}
+                  >
+                    No Logs
+                  </Text>
+                </View>
+              );
+            })}
+
           <View
             style={{ height: 300, backgroundColor: "white", marginTop: 10 }}
           />

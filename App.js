@@ -8,6 +8,7 @@ import AppProvider from "./context/AppContext";
 import HomeStack from "./screens/home/HomeStack";
 import { ClerkProvider } from "@clerk/clerk-expo";
 import { useAuth } from "@clerk/clerk-expo";
+import { StripeProvider } from "@stripe/stripe-react-native";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -34,7 +35,7 @@ export default function App() {
       <NavigationContainer>
         <StatusBar style="auto" />
 
-        <Stack.Navigator>
+        <Stack.Navigator screenOptions={{ gestureEnabled: false }}>
           <Stack.Screen
             name="AuthStack"
             component={AuthStack}

@@ -13,26 +13,10 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { doc, updateDoc } from "firebase/firestore";
 import { db, storage } from "../../utils/firebase";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { getBlobFroUri } from "../../utils/constants";
 
 const UserProfile = ({ navigation }) => {
   const { appUser, getUser } = useContext(AppContext);
-
-  const getBlobFroUri = async (uri) => {
-    const blob = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        resolve(xhr.response);
-      };
-      xhr.onerror = function (e) {
-        reject(new TypeError("Network request failed"));
-      };
-      xhr.responseType = "blob";
-      xhr.open("GET", uri, true);
-      xhr.send(null);
-    });
-
-    return blob;
-  };
 
   const [image, setImage] = useState(null);
   const pickImage = async () => {
@@ -69,9 +53,10 @@ const UserProfile = ({ navigation }) => {
       });
   };
 
-  const OptionsBox = () => {
+  const OptionsBox = ({ onClick, title }) => {
     return (
       <TouchableOpacity
+        onPress={onClick}
         style={{
           backgroundColor: "white",
           padding: 10,
@@ -87,7 +72,7 @@ const UserProfile = ({ navigation }) => {
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Ionicons name="heart-outline" size={25} />
           <Text style={{ marginLeft: 10, fontWeight: "bold", fontSize: 15 }}>
-            Favourites
+            {title}
           </Text>
         </View>
         <Ionicons name="chevron-forward-outline" size={25} />
@@ -179,12 +164,13 @@ const UserProfile = ({ navigation }) => {
       </View>
 
       <View style={{ marginTop: 20, justifyContent: "center" }}>
-        <OptionsBox />
-        <OptionsBox />
-        <OptionsBox />
-        <OptionsBox />
-        <OptionsBox />
-        <OptionsBox />
+        {/* <OptionsBox onClick={undefined} />
+        <OptionsBox onClick={undefined} />
+        <OptionsBox onClick={undefined} />
+        <OptionsBox onClick={undefined} />
+        <OptionsBox onClick={undefined} />
+        <OptionsBox onClick={undefined} /> */}
+        <OptionsBox title={"Subscribe"} onClick={() => {}} />
       </View>
     </SafeAreaView>
   );

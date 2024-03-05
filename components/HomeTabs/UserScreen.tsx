@@ -10,9 +10,11 @@ import {
   View,
 } from "react-native";
 import React from "react";
-import Carousel from "react-native-snap-carousel";
+import Carousel, { Pagination } from "react-native-snap-carousel";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import * as Progress from "react-native-progress";
 import HomeHeader from "../HomeHeader";
+import { screens } from "../../utils/constants";
 
 const UserScreen = ({ navigation }) => {
   <HomeHeader navigation={navigation} />;
@@ -56,7 +58,10 @@ const UserScreen = ({ navigation }) => {
     <SafeAreaView style={{ height: "100%" }}>
       <ScrollView style={{ flex: 1 }}>
         <HomeHeader navigation={navigation} />
-        <View
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate(screens.ExerciseSearch);
+          }}
           style={{
             flexDirection: "row",
             width: "100%",
@@ -79,10 +84,7 @@ const UserScreen = ({ navigation }) => {
               style={{ marginLeft: 10 }}
               color={"#667085"}
             />
-            <TextInput
-              style={{ flex: 1, marginHorizontal: 10 }}
-              placeholder="Search"
-            />
+            <Text style={{ color: "gray", marginLeft: 10 }}>Search</Text>
           </View>
           <TouchableOpacity
             style={{
@@ -94,7 +96,7 @@ const UserScreen = ({ navigation }) => {
           >
             <Ionicons name="filter-outline" size={30} />
           </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
 
         <Text
           style={{
@@ -108,18 +110,74 @@ const UserScreen = ({ navigation }) => {
           Trainer's Latest Updates
         </Text>
 
-        <View style={{ alignSelf: "center" }}>
-          {/* <Carousel
+        {/* <View style={{ alignSelf: "center", margin: 0 }}>
+          <Carousel
             layout="default"
-            // layoutCardOffset={10}
+            layoutCardOffset={10}
             ref={isCarousel}
             data={data}
             renderItem={renderItem}
             sliderWidth={SLIDER_WIDTH}
             itemWidth={450}
-            inactiveSlideShift={0}
-            useScrollView={true}
-          /> */}
+            style={{ margin: 0 }}
+          />
+        </View> */}
+
+        <View
+          style={{
+            backgroundColor: "#26272B",
+            padding: 10,
+            margin: 10,
+            height: 170,
+            borderRadius: 20,
+            justifyContent: "space-evenly",
+          }}
+        >
+          <View
+            style={{
+              padding: 4,
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <View>
+              <Text
+                style={{ color: "white", fontSize: 18, fontWeight: "bold" }}
+              >
+                Today's{"\n"}Activities
+              </Text>
+              <Text style={{ color: "white", marginTop: 8 }}>Body Weight</Text>
+            </View>
+            <Progress.Circle
+              size={50}
+              // borderWidth={5}
+              progress={0.5}
+              // borderColor="white"
+              thickness={6}
+              unfilledColor="white"
+            />
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              marginTop: 5,
+            }}
+          >
+            <View style={{ alignItems: "center" }}>
+              <Text style={{ color: "white" }}>1200 kcal</Text>
+              <Text style={{ color: "white" }}>Calories burned</Text>
+            </View>
+            <View style={{ alignItems: "center" }}>
+              <Text style={{ color: "white" }}>90bpm</Text>
+              <Text style={{ color: "white" }}>Heart Rate</Text>
+            </View>
+            <View style={{ alignItems: "center" }}>
+              <Text style={{ color: "white" }}>90bpm</Text>
+              <Text style={{ color: "white" }}>Heart Rate</Text>
+            </View>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -6,6 +6,7 @@ import HomeScreen from "./HomeScreen";
 import Inbox from "./Inbox";
 import ChatScreen from "./ChatScreen";
 import DiaryScreen from "./DiaryScreen";
+import ExerciseSearch from "../workoutscreens/ExerciseSearch";
 
 const HomeStack = () => {
   const Stack = createNativeStackNavigator();
@@ -30,6 +31,11 @@ const HomeStack = () => {
       <Stack.Screen
         name={screens.Diary}
         component={DiaryScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name={screens.ExerciseSearch}
+        component={ExerciseSearch}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

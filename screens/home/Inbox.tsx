@@ -1,4 +1,5 @@
 import {
+  RefreshControl,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -20,7 +21,7 @@ import {
 import { db } from "../../utils/firebase";
 
 const Inbox = ({ navigation }) => {
-  const { isTrainer, appUser, checkTrainer } = useContext(AppContext);
+  const { appUser, checkTrainer } = useContext(AppContext);
   const [chats, setchats] = useState<any>([]);
   const [inboxMessages, setinboxMessages] = useState<any>([]);
   const [trainerData, settrainerData] = useState<any>();
@@ -29,8 +30,6 @@ const Inbox = ({ navigation }) => {
 
   useEffect(() => {
     getTrainer();
-    console.log("Trainer Data", trainerData?.email);
-    getAllMessages();
     getAllInChatMessages();
     getTrainerUserList();
   }, []);
@@ -39,7 +38,7 @@ const Inbox = ({ navigation }) => {
     const docRef = doc(db, "users", appUser?.trainer);
     const docSnap = await getDoc(docRef);
     settrainerData(docSnap.data());
-    console.log(docSnap.data());
+    console.log("Trainer from get Trainer", docSnap.data());
   };
 
   const getAllInChatMessages = async () => {
@@ -56,17 +55,17 @@ const Inbox = ({ navigation }) => {
     setchats(messages);
   };
 
-  const getAllMessages = async () => {
-    const query = collection(db, "chats");
-    const querySnapshot = await getDocs(query);
-    const messages = [];
-    querySnapshot.forEach(async (doc) => {
-      console.log(doc.data());
-      await messages.push(doc.data());
-    });
-    setinboxMessages(messages);
-    console.log("Messages", messages);
-  };
+  // const getAllMessages = async () => {
+  //   const query = collection(db, "chats");
+  //   const querySnapshot = await getDocs(query);
+  //   const messages = [];
+  //   querySnapshot.forEach(async (doc) => {
+  //     console.log(doc.data());
+  //     await messages.push(doc.data());
+  //   });
+  //   setinboxMessages(messages);
+  //   console.log("Messages", messages);
+  // };
 
   const [trainerUsers, settrainerUsers] = useState<any>();
 
@@ -83,11 +82,21 @@ const Inbox = ({ navigation }) => {
     console.log("usersss", trainerUsers);
   };
 
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await getAllInChatMessages();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+
   return (
     <SafeAreaView>
       <View>
         <Text style={{ textAlign: "center", fontWeight: "bold", fontSize: 18 }}>
-          Messages + {isTrainer ? "Trainer" : "User"}
+          Inbox
         </Text>
       </View>
       <TouchableOpacity
@@ -99,22 +108,17 @@ const Inbox = ({ navigation }) => {
         <Text>Back</Text>
       </TouchableOpacity>
 
-      <ScrollView contentContainerStyle={{ height: "100%" }}>
-        {/* {trainerData &&
-          inboxMessages &&
-          inboxMessages.map((data, i) => {
-            console.log("Checkerr", data);
-            return (
-              <ChatBox
-                sender={appUser}
-                key={i}
-                data={data}
-                navigation={navigation}
-                reciever={data}
-              />
-            );
-          })} */}
-        {appUser?.isTrainer && (
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            colors={["black"]}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
+        contentContainerStyle={{ height: "100%" }}
+      >
+        {!appUser?.isTrainer && (
           <ChatBox
             sender={appUser}
             navigation={navigation}
@@ -122,7 +126,8 @@ const Inbox = ({ navigation }) => {
             data={trainerData}
           />
         )}
-        {trainerUsers &&
+        {appUser?.isTrainer &&
+          trainerUsers &&
           trainerUsers.map((data, i) => {
             return (
               <ChatBox

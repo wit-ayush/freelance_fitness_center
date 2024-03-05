@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import HomeHeader from "../HomeHeader";
-import { getTrainerUsers, images } from "../../utils/constants";
+import { images } from "../../utils/constants";
 import UserCard from "../UserCard";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {

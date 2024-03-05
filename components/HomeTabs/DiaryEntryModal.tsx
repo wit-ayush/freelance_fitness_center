@@ -6,21 +6,48 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Modal from "react-native-modal";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Dropdown } from "react-native-element-dropdown";
 import { logWorkouts } from "../../utils/constants";
 import Slider from "@react-native-community/slider";
-import RNDateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import CustomInput from "../CustomInput";
 import CustomButton from "../CustomButton";
+import { customAppStyles } from "../../utils/styles";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../../utils/firebase";
+import { AppContext } from "../../context/AppContext";
 
 const DiaryEntryModal = ({ modal, setIsModal }) => {
-  const [value, setValue] = useState(logWorkouts[0].value);
+  const [workoutSelected, setworkoutSelected] = useState(logWorkouts[0].value);
   const [isFocus, setIsFocus] = useState(false);
   const [workoutDuration, setworkoutDuration] = useState(10);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [dateSelected, setdateSelected] = useState<Date>();
+  const [showDateModal, setshowDateModal] = useState(false);
+
+  const { appUser } = useContext(AppContext);
+
+  const saveWorkoutLog = async () => {
+    const docRef = await addDoc(
+      collection(db, `workoutlogs/${appUser?.email}/logs`),
+      {
+        selectedWorkout: workoutSelected,
+        durationOfWorkout: workoutDuration,
+        setsPerformed: 3,
+        repsPerformed: 5,
+        dateSelect: dateSelected.toDateString(),
+      }
+    )
+      .then(() => {
+        setIsModal(false);
+      })
+      .catch((e) => console.log(e));
+
+    // console.log("Workout Registered here: ", docRef.id);
+  };
 
   return (
     <Modal
@@ -80,11 +107,11 @@ const DiaryEntryModal = ({ modal, setIsModal }) => {
             valueField="value"
             placeholder={!isFocus ? "Select item" : logWorkouts[0].label}
             searchPlaceholder="Search..."
-            value={value}
+            value={workoutSelected}
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
             onChange={(item) => {
-              setValue(item.value);
+              setworkoutSelected(item.value);
               setIsFocus(false);
             }}
           />
@@ -112,17 +139,6 @@ const DiaryEntryModal = ({ modal, setIsModal }) => {
           <Text style={{ marginTop: 20, fontWeight: "500" }}>
             Time Selected: {workoutDuration} mins
           </Text>
-          {/* <RNDateTimePicker
-          mode="date"
-          value={new Date()}
-          style={{
-            borderWidth: 1,
-            alignSelf: "center",
-            backgroundColor: "black",
-          }}
-          textColor="blue"
-          themeVariant="dark"
-        /> */}
           <CustomInput
             label={"Number of sets performed"}
             placeholder={"0"}
@@ -130,9 +146,39 @@ const DiaryEntryModal = ({ modal, setIsModal }) => {
             onChangeText={undefined}
             type="number-pad"
           />
+          <Text
+            style={{
+              marginLeft: 12,
+              fontSize: 15,
+              marginTop: 10,
+              marginBottom: 2,
+            }}
+          >
+            Date
+          </Text>
+          <TouchableOpacity
+            onPress={() => setshowDateModal(true)}
+            style={[customAppStyles.custInputViewStyle, {}]}
+          >
+            <Text style={{ color: "gray" }}>
+              {dateSelected ? dateSelected.toDateString() : "Select Date"}
+            </Text>
+          </TouchableOpacity>
+          <DateTimePickerModal
+            isVisible={showDateModal}
+            mode="date"
+            onConfirm={(date) => {
+              setdateSelected(date), setshowDateModal(false);
+            }}
+            onCancel={() => {
+              setshowDateModal(false);
+            }}
+          />
           <View style={{ position: "absolute", width: "100%", bottom: 20 }}>
             <CustomButton
-              onClick={undefined}
+              onClick={async () => {
+                await saveWorkoutLog();
+              }}
               title={"Save Workout Log"}
               textColor={"white"}
             />
