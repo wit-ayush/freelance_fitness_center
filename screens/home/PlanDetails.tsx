@@ -11,7 +11,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import CustomButton from "../../components/CustomButton";
 import PlanDetailModal from "../../components/PlanDetailModal";
 
-const PlanDetails = ({ navigation }) => {
+const PlanDetails = ({ navigation, route }) => {
+  const exercisePlan = route?.params?.exercisePlan;
   const planOptions = ["Overview"];
 
   const InfoBox = ({ text1, text2 }) => {
@@ -38,6 +39,7 @@ const PlanDetails = ({ navigation }) => {
       <PlanDetailModal
         modal={planModalDetailModal}
         setIsModal={setplanModalDetailModal}
+        planDetails={exercisePlan}
       />
       <TouchableOpacity
         onPress={() => navigation.goBack()}

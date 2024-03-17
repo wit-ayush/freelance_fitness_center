@@ -1,4 +1,5 @@
 import {
+  ImageBackground,
   ScrollView,
   StyleSheet,
   Text,
@@ -18,7 +19,7 @@ import {
   Cell,
 } from "react-native-table-component";
 
-const PlanDetailModal = ({ modal, setIsModal }) => {
+const PlanDetailModal = ({ modal, setIsModal, planDetails }) => {
   const tableData = {
     tableHead: ["Workouts", "Reps", "Duration"],
     tableData: [
@@ -83,6 +84,62 @@ const PlanDetailModal = ({ modal, setIsModal }) => {
     );
   };
 
+  const WorkoutComponent = () => {
+    return (
+      <View style={{ marginTop: 10, width: "90%", alignSelf: "center" }}>
+        <View style={{ backgroundColor: "#E0F2FE", padding: 10 }}>
+          <Text style={styles.outText}>Upper 1</Text>
+        </View>
+        <View
+          style={{
+            backgroundColor: "#F5FBFF",
+            padding: 10,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={styles.inText}>Upper 1</Text>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text style={[styles.inText, { marginRight: 20 }]}>13 x 5</Text>
+              <Text style={styles.inText}>3 mins+</Text>
+            </View>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={styles.inText}>Upper 1</Text>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text style={[styles.inText, { marginRight: 20 }]}>13 x 5</Text>
+              <Text style={styles.inText}>3 mins+</Text>
+            </View>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={styles.inText}>Upper 1</Text>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text style={[styles.inText, { marginRight: 20 }]}>13 x 5</Text>
+              <Text style={styles.inText}>3 mins+</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
   return (
     <Modal style={{ margin: 0, height: "100%" }} isVisible={modal}>
       <View
@@ -100,18 +157,45 @@ const PlanDetailModal = ({ modal, setIsModal }) => {
           >
             <Ionicons name="close-outline" size={30} />
           </TouchableOpacity>
+
+          <ImageBackground
+            style={{ height: 130, justifyContent: "center", marginTop: 20 }}
+            source={{ uri: "https://i.ibb.co/XxZX1Qw/1-1.png" }}
+          >
+            <View
+              style={{
+                backgroundColor: "white",
+                alignSelf: "center",
+                justifyContent: "center",
+                padding: 10,
+                borderRadius: 20,
+              }}
+            >
+              <Text style={{ fontWeight: "bold" }}>
+                Progressive bodybuilding
+              </Text>
+            </View>
+          </ImageBackground>
+
           <ScrollView>
-            <TableComponent
-              header1={"Phase 1 ( Week 1 - 4 )"}
-              header2={"Upper 1"}
-            />
-            <TableComponent header2={"Lower 1"} />
-            <TableComponent
-              header1={"Phase 1 ( Week 1 - 4 )"}
-              header2={"Upper 1"}
-            />
-            <TableComponent header2={"Lower 1"} />
-            <View style={{ height: 100 }} />
+            <View>
+              <Text
+                style={{
+                  marginLeft: 20,
+                  marginTop: 20,
+                  fontWeight: "bold",
+                  fontSize: 21,
+                }}
+              >
+                Phase (Weeks 1-4)
+              </Text>
+              <WorkoutComponent />
+              <WorkoutComponent />
+              <WorkoutComponent />
+              <WorkoutComponent />
+              <WorkoutComponent />
+              <WorkoutComponent />
+            </View>
           </ScrollView>
         </View>
       </View>
@@ -124,4 +208,13 @@ export default PlanDetailModal;
 const styles = StyleSheet.create({
   head: { height: 40, backgroundColor: "white" },
   text: { margin: 6 },
+  inText: {
+    fontSize: 15,
+    marginTop: 10,
+    fontWeight: "500",
+  },
+  outText: {
+    fontSize: 15,
+    fontWeight: "bold",
+  },
 });
