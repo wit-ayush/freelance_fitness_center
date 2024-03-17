@@ -8,20 +8,38 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import Modal from "react-native-modal";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import CustomButton from "./CustomButton";
 import Carousel from "react-native-snap-carousel";
+import { AppContext } from "../context/AppContext";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../utils/firebase";
+import { screens } from "../utils/constants";
 
-const SwitchTrainerSheet = ({ modal, setModal }) => {
-  const isCarousel = React.useRef(null);
-
-  const data = ["1", "2"];
+const SwitchTrainerSheet = ({
+  modal,
+  setModal,
+  allTrainers,
+  navigation,
+  getTrainer,
+}) => {
+  const { appUser, getUser } = useContext(AppContext);
 
   const SLIDER_WIDTH = Dimensions.get("window").width + 80;
 
-  const SwitchTrainerComponent = () => {
+  const switchTrainer = async (newTrainer: string) => {
+    await updateDoc(doc(db, "users", appUser?.email), {
+      trainer: newTrainer,
+    }).then(async () => {
+      await getUser();
+      await getTrainer();
+      setModal(false);
+    });
+  };
+
+  const SwitchTrainerComponent = ({ item }) => {
     return (
       <View
         style={{
@@ -44,13 +62,9 @@ const SwitchTrainerSheet = ({ modal, setModal }) => {
           }}
         >
           <View style={{ alignItems: "flex-start" }}>
-            <Image
-              source={require("../assets/images/avatar.png")}
-              height={100}
-              width={100}
-            />
+            <Image source={{ uri: item?.photo }} height={40} width={40} />
             <Text style={{ marginTop: 10, fontWeight: "bold", fontSize: 18 }}>
-              Khushaal Choithramani
+              {item?.name}
             </Text>
             <Text
               style={{
@@ -60,7 +74,7 @@ const SwitchTrainerSheet = ({ modal, setModal }) => {
                 color: "#475467",
               }}
             >
-              Yoga Expert
+              {item?.specialisation}
             </Text>
           </View>
         </View>
@@ -77,19 +91,25 @@ const SwitchTrainerSheet = ({ modal, setModal }) => {
             <Text style={{ fontWeight: "500", fontSize: 17, color: "#475467" }}>
               Experience
             </Text>
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>4 Years</Text>
+            <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+              {item?.experience} Years
+            </Text>
           </View>
           <View>
             <Text style={{ fontWeight: "500", fontSize: 17, color: "#475467" }}>
               Gender
             </Text>
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>Male</Text>
+            <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+              {item?.gender}
+            </Text>
           </View>
           <View>
             <Text style={{ fontWeight: "500", fontSize: 17, color: "#475467" }}>
               Age
             </Text>
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>30 years</Text>
+            <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+              {item?.age} years
+            </Text>
           </View>
         </View>
 
@@ -97,11 +117,7 @@ const SwitchTrainerSheet = ({ modal, setModal }) => {
           <Text style={{ color: "#475467", fontWeight: "bold", fontSize: 15 }}>
             Training Philosophy
           </Text>
-          <Text style={{ marginTop: 10 }}>
-            At justo diam amet magna sadipscing amet voluptua sea clita. Dolores
-            ea et vero sanctus et nonumy sanctus et sed. Et duo amet tempor sed
-            voluptua consetetur dolore lorem, sea.....
-          </Text>
+          <Text style={{ marginTop: 10 }}>{item?.desc}</Text>
         </View>
 
         <View
@@ -131,9 +147,21 @@ const SwitchTrainerSheet = ({ modal, setModal }) => {
 
         <View style={{ width: "100%", marginTop: 40 }}>
           <CustomButton
-            onClick={undefined}
-            title={"Select Trainer"}
-            textColor={"white"}
+            onClick={async () => {
+              await switchTrainer(item?.email);
+            }}
+            title={
+              appUser?.trainer == item?.email
+                ? "Current Trainer"
+                : "Select Trainer"
+            }
+            textColor={appUser?.trainer == item?.email ? "black" : "white"}
+            colors={
+              appUser?.trainer == item?.email
+                ? ["#fff", "#fff", "#fff"]
+                : ["#4c669f", "#3b5998", "#192f6a"]
+            }
+            disabled={appUser?.trainer == item?.email ? true : false}
           />
           <CustomButton
             onClick={undefined}
@@ -177,8 +205,8 @@ const SwitchTrainerSheet = ({ modal, setModal }) => {
               flexGrow: 1,
             }}
           >
-            {data.map((item, i) => {
-              return <SwitchTrainerComponent key={i} />;
+            {allTrainers.map((item, i) => {
+              return <SwitchTrainerComponent key={i} item={item} />;
             })}
           </ScrollView>
         </View>

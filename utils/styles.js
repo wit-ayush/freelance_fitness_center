@@ -10,4 +10,36 @@ export const customAppStyles = StyleSheet.create({
     justifyContent: "center",
     marginHorizontal: 10,
   },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  headerTitle2: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  subheading: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  subheading2: {
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  blueGlassmorphism: {
+    backgroundColor: "rgba(39, 51, 89, 0.4)",
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 30,
+    borderColor: "rgba(0, 0, 0, 0.3)",
+  },
+  whiteGlassmorphism: {
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    shadowColor: "white",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 30,
+    borderColor: "rgba(255, 255, 255, 0.3)",
+  },
 });

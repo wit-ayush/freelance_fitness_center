@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 import React, { createContext, useState, useEffect } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../utils/firebase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const AppContext = createContext();
 
@@ -10,10 +11,19 @@ const AppProvider = ({ children }) => {
   const [isTrainer, setisTrainer] = useState("");
   const [trainerData, settrainerData] = useState();
 
+  const saveCookie = async () => {
+    try {
+      const jsonValue = JSON.stringify(appUser);
+      await AsyncStorage.setItem("user", jsonValue);
+    } catch (e) {
+      console.log(e);
+    }
+  };
   const getUser = async () => {
     if (appUser) {
       const docRef = doc(db, "users", appUser?.email);
       const docSnap = await getDoc(docRef);
+      await saveCookie();
 
       if (docSnap.exists()) {
         await setappUser(docSnap.data());

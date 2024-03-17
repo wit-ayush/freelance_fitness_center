@@ -74,18 +74,20 @@ const CustomBottomNav = ({
           }}
           image={images.diary}
         />
-        <Icon title={"Posts"} />
+        <Icon title={"Posts"} image={images.postIcon} />
         <Icon
           onClick={() => {
             setActiveScreen(screens.PlanScreen);
           }}
           title={"Plans"}
+          image={images.planIcon}
         />
         <Icon
           onClick={() => {
             setActiveScreen(screens.UserProfile);
           }}
           title={"Profile"}
+          image={images.profileIcon}
         />
       </View>
     </View>

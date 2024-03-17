@@ -15,6 +15,10 @@ export const screens = {
   UserProfile: "UserProfile",
   TrainerHome: "TrainerHome",
   ExerciseSearch: "ExerciseSearch",
+  Payment: "PaymentScreen",
+  PaymentConfirm: "PaymentConfirm",
+  PlanDetails: "PlanDetails",
+  AddWorkouts: "AddWorkouts",
 };
 
 export const images = {
@@ -23,6 +27,9 @@ export const images = {
   homeIcon: require("../assets/icons/homeIcon.png"),
   diary: require("../assets/icons/diary.png"),
   dumbell: require("../assets/images/dumbell.png"),
+  planIcon: require("../assets/icons/plan.png"),
+  postIcon: require("../assets/icons/post.png"),
+  profileIcon: require("../assets/icons/profile.png"),
 };
 
 export const logWorkouts = [
@@ -32,6 +39,43 @@ export const logWorkouts = [
   { label: "Triceps", value: "Triceps" },
   { label: "Legs", value: "Legs" },
 ];
+
+const MET_VALUES = {
+  running: 8,
+  weightlifting: {
+    Chest: 3.5,
+    Biceps: 3,
+    Back: 3.5,
+    Triceps: 3,
+    Legs: 4,
+    // Add more workouts and their MET values as needed
+  },
+  // Add more exercises and their MET values as needed
+};
+
+function calculateCaloriesBurnt(exercise, bodyWeight, durationInMinutes) {
+  const lowerCaseExercise = exercise.toLowerCase();
+  let MET;
+
+  // Check if the exercise is a specific weightlifting exercise
+  if (
+    MET_VALUES["weightlifting"] &&
+    MET_VALUES["weightlifting"][lowerCaseExercise]
+  ) {
+    MET = MET_VALUES["weightlifting"][lowerCaseExercise];
+  } else {
+    MET = MET_VALUES[lowerCaseExercise];
+  }
+
+  if (!MET) {
+    console.error("MET value not found for the provided exercise.");
+    return null;
+  }
+
+  const durationInHours = durationInMinutes / 60;
+  const caloriesBurnt = MET * bodyWeight * durationInHours;
+  return caloriesBurnt;
+}
 
 export function getChatTimeFormat() {
   const now = new Date();

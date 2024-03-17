@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   SafeAreaView,
   StyleSheet,
@@ -6,17 +7,76 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../context/AppContext";
 import * as ImagePicker from "expo-image-picker";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { doc, updateDoc } from "firebase/firestore";
 import { db, storage } from "../../utils/firebase";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { getBlobFroUri } from "../../utils/constants";
+import { getBlobFroUri, screens } from "../../utils/constants";
+import { useStripe } from "@stripe/stripe-react-native";
 
 const UserProfile = ({ navigation }) => {
   const { appUser, getUser } = useContext(AppContext);
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const [loading, setLoading] = useState(false);
+
+  const API_URL = "http://localhost:8000";
+
+  const fetchPaymentSheetParams = async () => {
+    const amount = 1399;
+    const response = await fetch(`${API_URL}/payment-sheet`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ amount }),
+    });
+    const { paymentIntent, ephemeralKey, customer } = await response.json();
+
+    return {
+      paymentIntent,
+      ephemeralKey,
+      customer,
+    };
+  };
+
+  const initializePaymentSheet = async () => {
+    const { paymentIntent, ephemeralKey, customer, publishableKey } =
+      await fetchPaymentSheetParams();
+
+    const { error } = await initPaymentSheet({
+      returnURL: "",
+      merchantDisplayName: "Example, Inc.",
+      customerId: customer,
+      customerEphemeralKeySecret: ephemeralKey,
+      paymentIntentClientSecret: paymentIntent,
+      // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
+      //methods that complete payment after a delay, like SEPA Debit and Sofort.
+      allowsDelayedPaymentMethods: true,
+      defaultBillingDetails: {
+        name: "Jane Doe",
+      },
+    });
+    if (!error) {
+      setLoading(true);
+    }
+  };
+
+  // useEffect(() => {
+  //   initializePaymentSheet();
+  // }, []);
+
+  const openPaymentSheet = async () => {
+    const { error } = await presentPaymentSheet();
+
+    if (error) {
+      Alert.alert(`Error code: ${error.code}`, error.message);
+    } else {
+      Alert.alert("Success", "Your order is confirmed!");
+    }
+  };
 
   const [image, setImage] = useState(null);
   const pickImage = async () => {
@@ -67,6 +127,13 @@ const UserProfile = ({ navigation }) => {
           alignItems: "center",
           borderRadius: 10,
           marginTop: 8,
+          borderWidth: 0.5,
+          borderColor: "gray",
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.2,
+          shadowRadius: 2,
+          elevation: 5,
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -89,6 +156,13 @@ const UserProfile = ({ navigation }) => {
           alignSelf: "flex-start",
           padding: 8,
           borderRadius: 8,
+          borderWidth: 0.5,
+          borderColor: "gray",
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.2,
+          shadowRadius: 2,
+          elevation: 5,
         }}
       >
         <View style={{ alignItems: "center" }}>
@@ -116,8 +190,9 @@ const UserProfile = ({ navigation }) => {
   return (
     <SafeAreaView
       style={{
-        backgroundColor: "#EAECF0",
+        // backgroundColor: "#EAECF0",
         height: "100%",
+        backgroundColor: "white",
       }}
     >
       <View style={{ marginTop: 10 }}>
@@ -132,11 +207,27 @@ const UserProfile = ({ navigation }) => {
             await pickImage();
           }}
         >
-          {appUser && appUser?.photo && (
+          {appUser && appUser?.photo ? (
             <Image
               style={{ height: 70, width: 70, borderRadius: 35 }}
               source={{ uri: appUser?.photo }}
             />
+          ) : (
+            <View
+              style={{
+                alignItems: "center",
+                borderWidth: 2,
+                height: 100,
+                width: 100,
+                justifyContent: "center",
+                borderRadius: 50,
+              }}
+            >
+              <Image
+                style={{ height: 70, width: 70, borderRadius: 35 }}
+                source={{ uri: "https://i.ibb.co/FJ1cyK4/weightlifter.png" }}
+              />
+            </View>
           )}
         </TouchableOpacity>
         <Text
@@ -164,13 +255,13 @@ const UserProfile = ({ navigation }) => {
       </View>
 
       <View style={{ marginTop: 20, justifyContent: "center" }}>
-        {/* <OptionsBox onClick={undefined} />
-        <OptionsBox onClick={undefined} />
-        <OptionsBox onClick={undefined} />
-        <OptionsBox onClick={undefined} />
-        <OptionsBox onClick={undefined} />
-        <OptionsBox onClick={undefined} /> */}
-        <OptionsBox title={"Subscribe"} onClick={() => {}} />
+        <OptionsBox title={"Edit Profile"} onClick={async () => {}} />
+        <OptionsBox
+          title={"Subscribe"}
+          onClick={() => {
+            navigation.navigate(screens.Payment);
+          }}
+        />
       </View>
     </SafeAreaView>
   );

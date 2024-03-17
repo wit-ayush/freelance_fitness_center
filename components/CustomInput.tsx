@@ -21,7 +21,7 @@ const CustomInput = ({
           borderWidth: 2.7,
           padding: 10,
           borderRadius: 10,
-          height: 50,
+          height: multiLine ? 100 : 50,
           justifyContent: "center",
           marginHorizontal: 10,
         }}

@@ -8,9 +8,11 @@ const CustomButton = ({
   textColor,
   colors = ["#4c669f", "#3b5998", "#192f6a"],
   iconSource = null,
+  disabled = false,
 }) => {
   return (
     <TouchableOpacity
+      disabled={disabled}
       style={{
         alignSelf: "center",
         width: "100%",

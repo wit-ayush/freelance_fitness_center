@@ -1,4 +1,5 @@
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,48 +17,133 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import CustomInput from "../CustomInput";
 import CustomButton from "../CustomButton";
 import { customAppStyles } from "../../utils/styles";
-import { addDoc, collection } from "firebase/firestore";
-import { db } from "../../utils/firebase";
+import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 import { AppContext } from "../../context/AppContext";
+import { duration } from "moment";
+import { getDatabase, ref, child, push, update } from "firebase/database";
+import { db } from "../../utils/firebase";
 
-const DiaryEntryModal = ({ modal, setIsModal }) => {
-  const [workoutSelected, setworkoutSelected] = useState(logWorkouts[0].value);
+const DiaryEntryModal = ({
+  modal,
+  setIsModal,
+  getAllWorkoutLogs,
+  clickedData,
+  setClickedData,
+}) => {
+  console.log(clickedData);
+  const [workoutSelected, setworkoutSelected] = useState(
+    clickedData?.selectedWorkout
+  );
   const [isFocus, setIsFocus] = useState(false);
-  const [workoutDuration, setworkoutDuration] = useState(10);
+  const [workoutDuration, setworkoutDuration] = useState(
+    clickedData?.durationOfWorkout
+  );
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [dateSelected, setdateSelected] = useState<Date>();
+  const [dateSelected, setdateSelected] = useState<Date>(
+    new Date(clickedData?.dateSelect)
+  );
   const [showDateModal, setshowDateModal] = useState(false);
+  const [setsPerformed, setsetsPerformed] = useState(
+    clickedData ? clickedData.setsPerformed : 0
+  );
+  const [repsPerformed, setrepsPerformed] = useState(
+    clickedData?.repsPerformed
+  );
+  const [showstartTimeModal, setShowStartTimeModal] = useState(false);
+  const [showEndTimeModal, setshowEndTimeModal] = useState(false);
+  const [startTime, setstartTime] = useState<any>(clickedData?.startTime);
+  const [endTime, setendTime] = useState<any>(clickedData?.endTime);
 
   const { appUser } = useContext(AppContext);
 
+  const MET_VALUES = {
+    running: 8,
+    weightlifting: {
+      chest: 3.5,
+      biceps: 3,
+      back: 3.5,
+      triceps: 3,
+      legs: 4,
+      // Add more workouts and their MET values as needed
+    },
+    // Add more exercises and their MET values as needed
+  };
+
+  function calculateCaloriesBurnt(exercise, bodyWeight, durationInMinutes) {
+    const lowerCaseExercise = exercise.toLowerCase();
+    let MET;
+
+    // Check if the exercise is a specific weightlifting exercise
+    if (
+      MET_VALUES["weightlifting"] &&
+      MET_VALUES["weightlifting"][lowerCaseExercise]
+    ) {
+      MET = MET_VALUES["weightlifting"][lowerCaseExercise];
+    } else {
+      MET = MET_VALUES[lowerCaseExercise];
+    }
+
+    if (!MET) {
+      console.error("MET value not found for the provided exercise.");
+      return null;
+    }
+
+    const durationInHours = durationInMinutes / 60;
+    const caloriesBurnt = MET * bodyWeight * durationInHours;
+    return caloriesBurnt;
+  }
+
   const saveWorkoutLog = async () => {
-    const docRef = await addDoc(
-      collection(db, `workoutlogs/${appUser?.email}/logs`),
-      {
+    const database = getDatabase();
+    if (clickedData) {
+      await updateDoc(
+        doc(db, `workoutlogs/${appUser?.email}/logs`, clickedData?.id),
+        {
+          selectedWorkout: workoutSelected,
+          durationOfWorkout: workoutDuration,
+          setsPerformed: setsPerformed,
+          repsPerformed: repsPerformed,
+          dateSelect: dateSelected.toDateString(),
+          calorieBurnt: 90,
+          startTime: startTime,
+          endTime: endTime,
+        }
+      ).then(async () => {
+        await getAllWorkoutLogs();
+        setClickedData(null);
+        setIsModal(false);
+      });
+
+      return;
+    } else {
+      await addDoc(collection(db, `workoutlogs/${appUser?.email}/logs`), {
         selectedWorkout: workoutSelected,
         durationOfWorkout: workoutDuration,
-        setsPerformed: 3,
-        repsPerformed: 5,
+        setsPerformed: setsPerformed,
+        repsPerformed: repsPerformed,
         dateSelect: dateSelected.toDateString(),
-      }
-    )
-      .then(() => {
-        setIsModal(false);
+        calorieBurnt: 90,
+        startTime: startTime,
+        endTime: endTime,
       })
-      .catch((e) => console.log(e));
+        .then(async () => {
+          await getAllWorkoutLogs();
 
-    // console.log("Workout Registered here: ", docRef.id);
+          setIsModal(false);
+        })
+        .catch((e) => console.log(e));
+    }
   };
 
   return (
     <Modal
-      style={{ height: "50%" }}
+      style={{ height: "50%", margin: 0 }}
       onBackdropPress={() => {
         setIsModal(false);
       }}
       isVisible={modal}
     >
-      <View style={{ height: "87%" }}>
+      <View style={{ height: "100%" }}>
         <ScrollView
           keyboardShouldPersistTaps={"handled"}
           style={{
@@ -65,17 +151,19 @@ const DiaryEntryModal = ({ modal, setIsModal }) => {
             borderRadius: 20,
             padding: 10,
           }}
-          contentContainerStyle={{ flex: 1 }}
+          contentContainerStyle={{ flex: 1, height: "100%" }}
         >
           <View
             style={{
               flexDirection: "row",
               alignItems: "center",
               width: "100%",
+              marginTop: 40,
             }}
           >
             <TouchableOpacity
               onPress={() => {
+                setClickedData(null);
                 setIsModal(false);
               }}
             >
@@ -86,11 +174,11 @@ const DiaryEntryModal = ({ modal, setIsModal }) => {
                 textAlign: "center",
                 alignSelf: "center",
                 fontWeight: "bold",
-                fontSize: 16,
+                fontSize: 17,
                 marginLeft: 10,
               }}
             >
-              Add a new workout log
+              {clickedData ? "Edit Workout" : "Add a new workout log"}
             </Text>
           </View>
           <Text style={{ marginTop: 20 }}>Select Workout</Text>
@@ -142,8 +230,15 @@ const DiaryEntryModal = ({ modal, setIsModal }) => {
           <CustomInput
             label={"Number of sets performed"}
             placeholder={"0"}
-            value={undefined}
-            onChangeText={undefined}
+            value={setsPerformed}
+            onChangeText={setsetsPerformed}
+            type="number-pad"
+          />
+          <CustomInput
+            label={"Number of reps performed"}
+            placeholder={"0"}
+            value={repsPerformed}
+            onChangeText={setrepsPerformed}
             type="number-pad"
           />
           <Text
@@ -174,14 +269,109 @@ const DiaryEntryModal = ({ modal, setIsModal }) => {
               setshowDateModal(false);
             }}
           />
-          <View style={{ position: "absolute", width: "100%", bottom: 20 }}>
+          <DateTimePickerModal
+            isVisible={showstartTimeModal}
+            mode="time"
+            onConfirm={(date) => {
+              let hours = date.getHours();
+              let minutes: any = date.getMinutes();
+              minutes = minutes < 10 ? "0" + minutes : minutes;
+              const currentTime = hours + ":" + minutes;
+
+              setstartTime(currentTime);
+              setShowStartTimeModal(false);
+            }}
+            onCancel={() => {
+              setShowStartTimeModal(false);
+            }}
+          />
+          <View
+            style={{
+              flexDirection: "row",
+              alignSelf: "center",
+              width: "100%",
+              justifyContent: "space-evenly",
+            }}
+          >
+            <View>
+              <Text
+                style={{
+                  marginLeft: 12,
+                  fontSize: 15,
+                  marginTop: 10,
+                  marginBottom: 2,
+                }}
+              >
+                Start Time
+              </Text>
+              <TouchableOpacity
+                onPress={() => setShowStartTimeModal(true)}
+                style={[customAppStyles.custInputViewStyle, {}]}
+              >
+                <Text style={{ color: "gray" }}>
+                  {startTime ? startTime.toString() : "Select Time"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <DateTimePickerModal
+              isVisible={showEndTimeModal}
+              mode="time"
+              onConfirm={(date) => {
+                let hours = date.getHours();
+                let minutes: any = date.getMinutes();
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                const currentTime = hours + ":" + minutes;
+
+                setendTime(currentTime);
+                setshowEndTimeModal(false);
+              }}
+              onCancel={() => {
+                setshowEndTimeModal(false);
+              }}
+            />
+            <View>
+              <Text
+                style={{
+                  marginLeft: 12,
+                  fontSize: 15,
+                  marginTop: 10,
+                  marginBottom: 2,
+                }}
+              >
+                End Time
+              </Text>
+              <TouchableOpacity
+                onPress={() => setshowEndTimeModal(true)}
+                style={[customAppStyles.custInputViewStyle, {}]}
+              >
+                <Text style={{ color: "gray" }}>
+                  {endTime ? endTime.toString() : "Select Time"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={{}}>
             <CustomButton
               onClick={async () => {
-                await saveWorkoutLog();
+                if (
+                  !workoutDuration ||
+                  !workoutSelected ||
+                  !repsPerformed ||
+                  !setsPerformed ||
+                  !dateSelected
+                ) {
+                  Alert.alert("Complete the fields to save");
+
+                  return;
+                } else {
+                  await saveWorkoutLog();
+                }
               }}
-              title={"Save Workout Log"}
+              title={clickedData ? "Update Workout" : "Save Workout"}
               textColor={"white"}
             />
+            <View style={{ height: 300 }} />
           </View>
         </ScrollView>
       </View>

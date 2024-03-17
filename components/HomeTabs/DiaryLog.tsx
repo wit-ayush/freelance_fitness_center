@@ -26,10 +26,15 @@ const DiaryLog = ({ navigation }) => {
   const [userWorkoutLog, setuserWorkoutLog] = useState([]);
 
   const { appUser } = useContext(AppContext);
+  const [clickedData, setclickedData] = useState(undefined);
 
   useEffect(() => {
     getAllWorkoutLogs();
-  }, []);
+    if (clickedData) {
+      // console.log("From useefect", clickedData);
+      setModalVisible(true);
+    }
+  }, [clickedData]);
   // console.log(dateTapped.toDateString());
 
   const getAllWorkoutLogs = async () => {
@@ -37,13 +42,14 @@ const DiaryLog = ({ navigation }) => {
     const query = collection(db, `workoutlogs/${appUser?.email}/logs`);
     const querySnapshot = await getDocs(query);
     querySnapshot.forEach(async (doc) => {
-      await workoutLogs.push(doc.data());
+      await workoutLogs.push({ id: doc.id, ...doc.data() });
+      console.log(doc.id);
     });
     setuserWorkoutLog(workoutLogs);
-    console.log(workoutLogs);
+    // console.log(workoutLogs);
   };
 
-  const LogComponent = () => {
+  const LogComponent = ({ data }) => {
     return (
       <View
         style={{
@@ -61,11 +67,21 @@ const DiaryLog = ({ navigation }) => {
             alignItems: "center",
           }}
         >
-          <Text style={{ fontWeight: "bold", fontSize: 15 }}>11:35</Text>
+          <Text style={{ fontWeight: "bold", fontSize: 15 }}>
+            {data?.startTime}
+          </Text>
           <View style={styles.verticalLine} />
-          <Text style={{ fontWeight: "bold", fontSize: 15 }}>11:35</Text>
+          <Text style={{ fontWeight: "bold", fontSize: 15 }}>
+            {data?.endTime}
+          </Text>
         </View>
         <TouchableOpacity
+          onPress={() => {
+            setclickedData(data);
+
+            // setModalVisible(true);
+            // console.log(clickedData);
+          }}
           style={{
             width: "80%",
             borderColor: "#D0D5DD",
@@ -93,7 +109,7 @@ const DiaryLog = ({ navigation }) => {
               />
               <View style={{ marginLeft: 10 }}>
                 <Text>Cardio</Text>
-                <Text>Legs</Text>
+                <Text>{data?.selectedWorkout}</Text>
               </View>
             </View>
             <View>
@@ -108,18 +124,8 @@ const DiaryLog = ({ navigation }) => {
               justifyContent: "space-evenly",
             }}
           >
-            <Text>Exercise</Text>
-            <Progress.Bar
-              progress={0.6}
-              width={170}
-              height={10}
-              borderRadius={20}
-              unfilledColor="#7CD4FD"
-              color="#065986"
-              borderColor="#fff"
-              style={{ height: 10 }}
-            />
-            <Text>4 of 6</Text>
+            <Text> Sets : {data?.setsPerformed}</Text>
+            <Text> Reps : {data?.repsPerformed}</Text>
           </View>
 
           <View
@@ -159,7 +165,13 @@ const DiaryLog = ({ navigation }) => {
   ];
   return (
     <SafeAreaView style={{ height: "100%" }}>
-      <DiaryEntryModal setIsModal={setModalVisible} modal={isModalVisible} />
+      <DiaryEntryModal
+        getAllWorkoutLogs={getAllWorkoutLogs}
+        setIsModal={setModalVisible}
+        modal={isModalVisible}
+        clickedData={clickedData}
+        setClickedData={setclickedData}
+      />
       <View>
         <Text style={{ textAlign: "center", fontWeight: "bold", fontSize: 20 }}>
           Diary Log
@@ -181,9 +193,8 @@ const DiaryLog = ({ navigation }) => {
           style={{ width: "100%", height: 100 }}
           markedDates={markedDatesArray}
           calendarAnimation={{ type: "sequence", duration: 1000 / 4 }}
-          onDateSelected={(date) => {
+          onDateSelected={async (date) => {
             setdateTapped(date.toDate());
-            console.log(dateTapped.toDateString());
             markedDatesArray.push({
               date: date.toDate(),
               dots: [
@@ -221,32 +232,35 @@ const DiaryLog = ({ navigation }) => {
           </Text>
         </View>
         <ScrollView style={{ height: "100%" }}>
-          {userWorkoutLog &&
+          {/* {userWorkoutLog &&
             userWorkoutLog.map((data, i) => {
               if (dateTapped.toDateString() == data.dateSelect) {
-                return <LogComponent key={i} />;
-              }
-              return (
-                <View
-                  style={{ height: "100%", justifyContent: "center" }}
-                  key={i}
-                >
-                  <Text
-                    style={{
-                      textAlign: "center",
-                      fontWeight: "bold",
-                      fontSize: 18,
-                    }}
+                return <LogComponent data={data} key={i} />;
+              } else {
+                return (
+                  <View
+                    style={{ height: "100%", justifyContent: "center" }}
+                    key={i}
                   >
-                    No Logs
-                  </Text>
-                </View>
-              );
-            })}
-
-          <View
-            style={{ height: 300, backgroundColor: "white", marginTop: 10 }}
-          />
+                    <Text
+                      style={{
+                        textAlign: "center",
+                        fontWeight: "bold",
+                        fontSize: 18,
+                      }}
+                    >
+                      No Logs
+                    </Text>
+                  </View>
+                );
+              }
+            })} */}
+          {userWorkoutLog.map((data, i) => {
+            if (data.dateSelect == dateTapped.toDateString()) {
+              return <LogComponent data={data} key={i} />;
+            }
+          })}
+          <View style={{ height: 100 }} />
         </ScrollView>
       </View>
 

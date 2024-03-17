@@ -170,8 +170,8 @@ const Signin = ({ navigation }) => {
                       AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
                       AppleAuthentication.AppleAuthenticationScope.EMAIL,
                     ],
-                  }).then((result) => {
-                    console.log(result.fullName);
+                  }).then(async (result) => {
+                    await console.log(result);
                   });
                 } catch (e) {
                   if (e.code === "ERR_REQUEST_CANCELED") {

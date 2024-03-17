@@ -7,20 +7,33 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import * as Progress from "react-native-progress";
 import CustomButton from "../../components/CustomButton";
 import { screens } from "../../utils/constants";
 import QuestionSection from "../../components/QuestionSection";
+import { AppContext } from "../../context/AppContext";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../../utils/firebase";
 
 const QuestionScreen = ({ navigation }) => {
   const [questionNumber, setquestionNumber] = useState(0);
   const [progressBarController, setprogressBarController] = useState(0.1);
 
+  const { appUser, getUser } = useContext(AppContext);
+
   const [gender, setgender] = useState("");
-  const [age, setage] = useState("");
+  const [age, setage] = useState();
+  const [height, setheight] = useState();
+  const [Weight, setWeight] = useState();
+  const [trainingGoal, settrainingGoal] = useState("");
+  const [sleepHours, setsleepHours] = useState();
+  const [trainingHours, settrainingHours] = useState();
+  const [allergies, setallergies] = useState();
   return (
-    <SafeAreaView style={{ height: "100%", width: "100%" }}>
+    <SafeAreaView
+      style={{ height: "100%", width: "100%", backgroundColor: "white" }}
+    >
       <Text style={{ textAlign: "center", fontSize: 20, fontWeight: "bold" }}>
         Fitness Goals
       </Text>
@@ -80,16 +93,16 @@ const QuestionScreen = ({ navigation }) => {
           <>
             <QuestionSection
               question="How much do you weigh?"
-              setSelectedOption={setage}
-              option={age}
+              setSelectedOption={setWeight}
+              option={Weight}
               keyboardType="numeric"
               textBox
               placeholder="Enter Your Weight"
             />
             <QuestionSection
               question="How tall are you?"
-              setSelectedOption={setage}
-              option={age}
+              setSelectedOption={setheight}
+              option={height}
               keyboardType="numeric"
               textBox
               placeholder="Enter Your Height"
@@ -105,10 +118,39 @@ const QuestionScreen = ({ navigation }) => {
               "Improve Indurance",
               "Increase Strength",
             ]}
-            setSelectedOption={setgender}
-            option={gender}
+            setSelectedOption={settrainingGoal}
+            option={trainingGoal}
           />
         )}
+        {questionNumber == 4 && (
+          <>
+            <QuestionSection
+              question="How many hours can you put inn?"
+              setSelectedOption={settrainingHours}
+              option={trainingHours}
+              keyboardType="numeric"
+              textBox
+              placeholder="Enter hours"
+            />
+            <QuestionSection
+              question="How many hours do you sleep?"
+              setSelectedOption={setsleepHours}
+              option={sleepHours}
+              keyboardType="numeric"
+              textBox
+              placeholder="Enter Sleeping hours"
+            />
+            <QuestionSection
+              question="Any Allergies? Please Describe"
+              setSelectedOption={setallergies}
+              option={allergies}
+              textBox
+              placeholder="Describe about your allergies (if they exist)"
+              multiLine={true}
+            />
+          </>
+        )}
+        {questionNumber == 5 && <></>}
       </View>
 
       <View
@@ -124,7 +166,24 @@ const QuestionScreen = ({ navigation }) => {
           title={"Continue"}
           textColor={"white"}
           colors={["#4c669f", "#3b5998", "#192f6a"]}
-          onClick={() => {
+          onClick={async () => {
+            if (questionNumber == 5) {
+              await updateDoc(doc(db, "users", appUser?.email), {
+                Weight,
+                height,
+                gender,
+                sleepHours,
+                trainingHours,
+                trainingGoal,
+                allergies,
+                age,
+              }).then(async () => {
+                await getUser().then(() => {
+                  navigation.navigate(screens.Payment);
+                });
+              });
+            }
+
             setquestionNumber(questionNumber + 1);
             setprogressBarController(progressBarController + 0.1);
             console.log("Gender Selected: ", gender);

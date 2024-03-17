@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import HomeHeader from "../HomeHeader";
-import { images } from "../../utils/constants";
+import { images, screens } from "../../utils/constants";
 import UserCard from "../UserCard";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
@@ -93,7 +93,7 @@ const TrainerHome = ({ navigation }) => {
           width: "100%",
         }}
       >
-        <ClientInfo textTitle={430} textSubtitle={"Client"} />
+        <ClientInfo textTitle={trainerUsers.length} textSubtitle={"Client"} />
         <ClientInfo textTitle={24} textSubtitle={"Plans"} />
 
         <ClientInfo textTitle={12} textSubtitle={"Exercises"} />
@@ -126,7 +126,14 @@ const TrainerHome = ({ navigation }) => {
       <View style={{ marginTop: 10, marginLeft: 20 }}>
         <Text style={{ fontSize: 15 }}>Quick Actions</Text>
         <ActionCard onClick={undefined} title={"Add a new meal plan"} />
-        <ActionCard onClick={undefined} title={"Add a new exercise plan"} />
+        <ActionCard
+          onClick={() => {
+            navigation.navigate(screens.AddWorkouts, {
+              allUsers: trainerUsers,
+            });
+          }}
+          title={"Add a new exercise plan"}
+        />
         <ActionCard onClick={undefined} title={"Podcast / Video"} />
       </View>
     </SafeAreaView>

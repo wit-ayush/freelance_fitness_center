@@ -9,6 +9,8 @@ import HomeStack from "./screens/home/HomeStack";
 import { ClerkProvider } from "@clerk/clerk-expo";
 import { useAuth } from "@clerk/clerk-expo";
 import { StripeProvider } from "@stripe/stripe-react-native";
+import { screens } from "./utils/constants";
+import PaymentScreen from "./screens/authentication/PaymentScreen";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -31,24 +33,26 @@ export default function App() {
   };
 
   return (
-    <AppProvider>
-      <NavigationContainer>
-        <StatusBar style="auto" />
+    <StripeProvider publishableKey="pk_test_51OfpGCCm75vwzAvzWZhqlCSipLrIff087TuIbTxu1qoOV9WHrOpZ1eOdcPQVBSME8SsnV539S2z0BRGJDnverNQR00nnrhkK8D">
+      <AppProvider>
+        <NavigationContainer>
+          <StatusBar style="auto" />
 
-        <Stack.Navigator screenOptions={{ gestureEnabled: false }}>
-          <Stack.Screen
-            name="AuthStack"
-            component={AuthStack}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="HomeStack"
-            component={HomeStack}
-            options={{ headerShown: false }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </AppProvider>
+          <Stack.Navigator screenOptions={{ gestureEnabled: false }}>
+            <Stack.Screen
+              name="AuthStack"
+              component={AuthStack}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="HomeStack"
+              component={HomeStack}
+              options={{ headerShown: false }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </AppProvider>
+    </StripeProvider>
   );
 }
 

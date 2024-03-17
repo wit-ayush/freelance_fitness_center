@@ -11,7 +11,7 @@ import {
   Platform,
   Alert,
 } from "react-native";
-import React, { Children, useState } from "react";
+import React, { Children, useContext, useEffect, useState } from "react";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
@@ -19,6 +19,8 @@ import { images, screens } from "../../utils/constants";
 import { auth, db } from "../../utils/firebase";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { collection, addDoc, doc, setDoc, getDoc } from "firebase/firestore";
+import { AppContext } from "../../context/AppContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Signup = ({ navigation }) => {
   const [name, setname] = useState("");
@@ -26,18 +28,47 @@ const Signup = ({ navigation }) => {
   const [password, setpassword] = useState("");
   const [confirmPassword, setconfirmPassword] = useState("");
 
+  const { appUser, setappUser } = useContext(AppContext);
+
+  const saveCookie = async () => {
+    try {
+      const jsonValue = JSON.stringify(appUser);
+      await AsyncStorage.setItem("user", jsonValue);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   const addUserToDatabase = async () => {
     const userDockRef = doc(db, "users", email);
     try {
       await setDoc(userDockRef, {
-        name,
-        email,
+        name: name,
+        email: email,
+        photo: "https://i.ibb.co/FJ1cyK4/weightlifter.png",
+        isTrainer: false,
+        trainer: "",
+      }).then(async () => {
+        const docRef = doc(db, "users", email);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setappUser(docSnap.data());
+        }
       });
+
       console.log("Document written with ID: ", userDockRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
   };
+
+  useEffect(() => {
+    if (appUser != null) {
+      saveCookie();
+      navigation.navigate(screens.Question);
+    }
+  }, [appUser]);
 
   const handleSignup = async () => {
     if (confirmPassword != password) {
@@ -122,7 +153,10 @@ const Signup = ({ navigation }) => {
             />
             <View style={{ marginTop: 20 }}>
               <CustomButton
-                onClick={handleSignup}
+                onClick={async () => {
+                  await handleSignup();
+                  // navigation.navigate(screens.Question);
+                }}
                 title={"Create an Account"}
                 textColor={"white"}
               />

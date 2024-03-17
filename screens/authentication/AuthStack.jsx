@@ -8,6 +8,8 @@ import QuestionScreen from "./QuestionScreen";
 import Signup from "./Signup";
 import Signin from "./Signin";
 import HomeStack from "../home/HomeStack";
+import PaymentScreen from "./PaymentScreen";
+import PaymentConfirmation from "./PaymentConfirmation";
 
 const AuthStack = () => {
   const Stack = createNativeStackNavigator();
@@ -36,6 +38,16 @@ const AuthStack = () => {
       <Stack.Screen
         name={screens.Signin}
         component={Signin}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name={screens.Payment}
+        component={PaymentScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name={screens.PaymentConfirm}
+        component={PaymentConfirmation}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

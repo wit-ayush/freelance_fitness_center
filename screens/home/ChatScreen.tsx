@@ -58,28 +58,32 @@ const ChatScreen = ({ route, navigation }) => {
   const getAllInChatMessages = async () => {
     const messages = [];
     if (appUser?.isTrainer) {
-      const query = collection(
+      const ref = collection(
         db,
         `chats/${reciever?.email + sender?.email}/chat`
       );
-      const querySnapshot = await getDocs(query);
+      const queryData = query(ref, orderBy("timestamp", "asc"));
+      const querySnapshot = await getDocs(queryData);
       querySnapshot.forEach(async (doc) => {
-        //   console.log("Message Data", doc.data());
+        console.log("doc");
+        console.log("Doc", doc.data());
         await messages.push(doc.data());
       });
     } else {
-      const query = collection(
+      const ref = collection(
         db,
         `chats/${sender?.email + reciever?.email}/chat`
       );
-      const querySnapshot = await getDocs(query);
+      const queryData = query(ref, orderBy("timestamp", "asc"));
+      const querySnapshot = await getDocs(queryData);
       querySnapshot.forEach(async (doc) => {
-        //   console.log("Message Data", doc.data());
+        console.log("doc");
+        console.log("Doc", doc.data());
         await messages.push(doc.data());
       });
     }
     setallMessages(messages);
-    console.log(messages);
+    console.log("Messages", messages);
   };
 
   const getUserTrainer = async () => {
@@ -101,10 +105,15 @@ const ChatScreen = ({ route, navigation }) => {
     const textTime = getChatTimeFormat();
 
     let downloadMediaURL;
-    const imageRef = ref(
-      storage,
-      `users/${appUser?.name}/media/${mediaSelected?.name}`
-    );
+
+    let imageRef;
+
+    if (mediaSelected) {
+      imageRef = ref(
+        storage,
+        `users/${appUser?.name}/media/${mediaSelected?.name}`
+      );
+    }
 
     if (mediaSelected && mediaBlob) {
       await uploadBytes(imageRef, mediaBlob)
@@ -135,7 +144,7 @@ const ChatScreen = ({ route, navigation }) => {
             text: message,
             media: downloadMediaURL ? downloadMediaURL : null,
             timeSent: textTime,
-            mediaName: mediaSelected?.name,
+            mediaName: mediaSelected ? mediaSelected?.name : null,
           }
         );
         await getAllInChatMessages();

@@ -9,8 +9,9 @@ const HomeHeader = ({ navigation }) => {
   const { appUser } = useContext(AppContext);
 
   const signOut = async () => {
-    await AsyncStorage.removeItem("user");
-    navigation.navigate(screens.Signin);
+    await AsyncStorage.removeItem("user").then(() => {
+      navigation.navigate(screens.Signin);
+    });
   };
   return (
     <View
@@ -22,10 +23,12 @@ const HomeHeader = ({ navigation }) => {
       }}
     >
       <TouchableOpacity onPress={signOut}>
-        <Image
-          source={{ uri: appUser?.photo }}
-          style={{ height: 50, width: 50, borderRadius: 25 }}
-        />
+        {appUser && appUser?.photo && (
+          <Image
+            source={{ uri: appUser?.photo }}
+            style={{ height: 50, width: 50, borderRadius: 25 }}
+          />
+        )}
       </TouchableOpacity>
       <Text style={{ fontWeight: "bold", fontSize: 17 }}>{appUser?.email}</Text>
       <View style={{ flexDirection: "row" }}>
