@@ -16,101 +16,55 @@ import { db, storage } from "../../utils/firebase";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { getBlobFroUri, screens } from "../../utils/constants";
 import { useStripe } from "@stripe/stripe-react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const UserProfile = ({ navigation }) => {
-  const { appUser, getUser } = useContext(AppContext);
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
-  const [loading, setLoading] = useState(false);
-
-  const API_URL = "http://localhost:8000";
-
-  const fetchPaymentSheetParams = async () => {
-    const amount = 1399;
-    const response = await fetch(`${API_URL}/payment-sheet`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ amount }),
-    });
-    const { paymentIntent, ephemeralKey, customer } = await response.json();
-
-    return {
-      paymentIntent,
-      ephemeralKey,
-      customer,
-    };
+  const { appUser, getUser, setappUser } = useContext(AppContext);
+  const signOut = async () => {
+    await AsyncStorage.removeItem("user");
+    setappUser(null);
   };
-
-  const initializePaymentSheet = async () => {
-    const { paymentIntent, ephemeralKey, customer, publishableKey } =
-      await fetchPaymentSheetParams();
-
-    const { error } = await initPaymentSheet({
-      returnURL: "",
-      merchantDisplayName: "Example, Inc.",
-      customerId: customer,
-      customerEphemeralKeySecret: ephemeralKey,
-      paymentIntentClientSecret: paymentIntent,
-      // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
-      //methods that complete payment after a delay, like SEPA Debit and Sofort.
-      allowsDelayedPaymentMethods: true,
-      defaultBillingDetails: {
-        name: "Jane Doe",
-      },
-    });
-    if (!error) {
-      setLoading(true);
+  useEffect(() => {
+    if (appUser == null) {
+      navigation.navigate(screens.AuthScreen);
     }
-  };
-
-  // useEffect(() => {
-  //   initializePaymentSheet();
-  // }, []);
-
-  const openPaymentSheet = async () => {
-    const { error } = await presentPaymentSheet();
-
-    if (error) {
-      Alert.alert(`Error code: ${error.code}`, error.message);
-    } else {
-      Alert.alert("Success", "Your order is confirmed!");
-    }
-  };
-
+  }, [appUser, setappUser]);
   const [image, setImage] = useState(null);
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-    const imageRef = ref(storage, `users/profileImages/${appUser?.name}`);
-    const imageBlob: any = await getBlobFroUri(result.assets[0].uri);
-
-    console.log("Blob", imageBlob);
-
-    await uploadBytes(imageRef, imageBlob)
-      .then(async (snapshot) => {
-        const downloadURL = await getDownloadURL(imageRef);
-        // await console.log(downloadURL);
-        await updateDoc(doc(db, "users", appUser?.email), {
-          photo: downloadURL,
-        });
-      })
-      .then(async (result) => {
-        // console.log(result);
-        await getUser();
-      })
-      .catch((e) => {
-        console.log(e);
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
       });
+
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
+      }
+      const imageRef = ref(storage, `users/profileImages/${appUser?.name}`);
+      const imageBlob: any = await getBlobFroUri(result.assets[0].uri);
+
+      console.log("Blob", imageBlob);
+
+      await uploadBytes(imageRef, imageBlob)
+        .then(async (snapshot) => {
+          const downloadURL = await getDownloadURL(imageRef);
+          // await console.log(downloadURL);
+          await updateDoc(doc(db, "users", appUser?.email), {
+            photo: downloadURL,
+          });
+        })
+        .then(async (result) => {
+          // console.log(result);
+          await getUser();
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    } catch (error) {
+      console.log("From Photo Change", error);
+    }
   };
 
   const OptionsBox = ({ onClick, title }) => {
@@ -262,6 +216,7 @@ const UserProfile = ({ navigation }) => {
             navigation.navigate(screens.Payment);
           }}
         />
+        <OptionsBox title={"Sign out"} onClick={signOut} />
       </View>
     </SafeAreaView>
   );

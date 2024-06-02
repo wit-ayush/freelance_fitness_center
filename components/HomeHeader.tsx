@@ -9,6 +9,7 @@ const HomeHeader = ({ navigation }) => {
   const { appUser } = useContext(AppContext);
 
   const signOut = async () => {
+    await AsyncStorage.removeItem("user");
     await AsyncStorage.removeItem("user").then(() => {
       navigation.navigate(screens.Signin);
     });
@@ -22,7 +23,7 @@ const HomeHeader = ({ navigation }) => {
         alignItems: "center",
       }}
     >
-      <TouchableOpacity onPress={signOut}>
+      <TouchableOpacity>
         {appUser && appUser?.photo && (
           <Image
             source={{ uri: appUser?.photo }}
@@ -30,7 +31,7 @@ const HomeHeader = ({ navigation }) => {
           />
         )}
       </TouchableOpacity>
-      <Text style={{ fontWeight: "bold", fontSize: 17 }}>{appUser?.email}</Text>
+      {/* <Text style={{ fontWeight: "bold", fontSize: 17 }}>{appUser?.email}</Text> */}
       <View style={{ flexDirection: "row" }}>
         <TouchableOpacity
           onPress={() => {
@@ -38,7 +39,7 @@ const HomeHeader = ({ navigation }) => {
           }}
           style={{ marginRight: 10 }}
         >
-          <Ionicons size={27} name="chatbox-ellipses-outline" />
+          <Ionicons color={"black"} size={27} name="chatbox-ellipses-outline" />
         </TouchableOpacity>
         <TouchableOpacity style={{}}>
           <Ionicons size={27} name="notifications-outline" />

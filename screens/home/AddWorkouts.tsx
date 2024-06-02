@@ -37,15 +37,21 @@ const AddWorkouts = ({ route, navigation }) => {
   const [repsCount, setrepsCount] = useState("");
   const [duration, setduration] = useState("");
   const [addedWorkouts, setaddedWorkouts] = useState([]);
+  const [allPhases, setAllPhases] = useState([]);
+  const workoutTableHead = ["Workouts", "Reps", "Duration"];
+  const [workoutTableData, setworkoutTableData] = useState([]);
+
+  const [workoutFocus, setworkoutFocus] = useState("");
+  const phasesTableHead = ["Phase", "Name"];
+  const [phasesTableData, setPhaseTableData] = useState([]);
+  const [phaseName, setphaseName] = useState("");
+  const [phaseDesc, setphaseDesc] = useState("");
 
   const saveExercise = async () => {
     await addDoc(collection(db, `users/${appUser?.email}/exercisePlans`), {
       trainer: appUser?.email,
-      workouts: addedWorkouts,
-      phaseTitle: "test",
-      focusPart: "test",
-      setDescription:
-        "Sed ipsum accusam amet no ipsum. Rebum aliquyam sit consetetur ipsum erat dolor et lorem elitr, no est ut diam.",
+      phases: allPhases,
+      focusPart: workoutFocus,
       users: selectedUsers,
     }).then(() => {
       Alert.alert("Exercise Posted");
@@ -53,8 +59,31 @@ const AddWorkouts = ({ route, navigation }) => {
     });
   };
 
-  const tableHead = ["Workouts", "Reps", "Duration"];
-  const [tableData, settableData] = useState([["Chest", "4 x 12", "3 mins+"]]);
+  const addPhase = () => {
+    if (!phaseName) {
+      return Alert.alert("Complete all fields");
+    }
+    setPhaseTableData([
+      ...phasesTableData,
+      [(phasesTableData.length + 1).toString(), phaseName],
+    ]);
+    setAllPhases([
+      ...allPhases,
+      {
+        name: phaseName,
+        workouts: addedWorkouts,
+        desc: phaseDesc,
+      },
+    ]);
+    console.log(allPhases);
+
+    setaddedWorkouts([]);
+
+    setworkoutTableData([]);
+
+    setphaseName("");
+    setphaseDesc("");
+  };
 
   return (
     <SafeAreaView style={{ backgroundColor: "white" }}>
@@ -122,22 +151,49 @@ const AddWorkouts = ({ route, navigation }) => {
               })}
             </View>
             <CustomInput
+              label={"Enter Workout Focus"}
+              placeholder={"Enter here"}
+              value={workoutFocus}
+              onChangeText={setworkoutFocus}
+            />
+            <View style={{ marginTop: 10 }}>
+              <Table
+                borderStyle={{
+                  borderWidth: 2,
+                  borderColor: "lightgray",
+                  backgroundColor: "white",
+                  borderRadius: 10,
+                }}
+                style={{ width: "90%", alignSelf: "center" }}
+              >
+                <Row
+                  data={phasesTableHead}
+                  style={styles.head}
+                  textStyle={{
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    fontSize: 16,
+                  }}
+                />
+                <Rows
+                  data={phasesTableData}
+                  textStyle={{ padding: 6, textAlign: "center" }}
+                  style={{}}
+                />
+              </Table>
+            </View>
+            <CustomInput
               label={"Enter Phase Title"}
               placeholder={"Enter here"}
-              value={undefined}
-              onChangeText={undefined}
+              value={phaseName}
+              onChangeText={setphaseName}
             />
+
             <CustomInput
-              label={"Enter Focus"}
-              placeholder={"Enter here"}
-              value={undefined}
-              onChangeText={undefined}
-            />
-            <CustomInput
-              label={"Enter Phase Title"}
+              label={"Enter Phase Description"}
               placeholder={"Enter Description"}
-              value={undefined}
-              onChangeText={undefined}
+              value={phaseDesc}
+              onChangeText={setphaseDesc}
               multiLine
             />
 
@@ -163,7 +219,7 @@ const AddWorkouts = ({ route, navigation }) => {
                 style={{ width: "90%", alignSelf: "center" }}
               >
                 <Row
-                  data={tableHead}
+                  data={workoutTableHead}
                   style={styles.head}
                   textStyle={{
                     textAlign: "center",
@@ -172,7 +228,7 @@ const AddWorkouts = ({ route, navigation }) => {
                   }}
                 />
                 <Rows
-                  data={tableData}
+                  data={workoutTableData}
                   textStyle={{ padding: 6, textAlign: "center" }}
                   style={{}}
                 />
@@ -217,8 +273,8 @@ const AddWorkouts = ({ route, navigation }) => {
                   if (!workoutName || !repsCount || !duration) {
                     return Alert.alert("Complete all fields");
                   }
-                  settableData([
-                    ...tableData,
+                  setworkoutTableData([
+                    ...workoutTableData,
                     [workoutName, repsCount, duration],
                   ]);
                   setaddedWorkouts([
@@ -239,6 +295,11 @@ const AddWorkouts = ({ route, navigation }) => {
                 <Ionicons name="add-circle-outline" size={30} />
               </TouchableOpacity>
             </View>
+            <CustomButton
+              onClick={addPhase}
+              title={"Add Phase"}
+              textColor={"white"}
+            />
 
             <CustomButton
               onClick={saveExercise}

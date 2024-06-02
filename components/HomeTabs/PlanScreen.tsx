@@ -35,7 +35,7 @@ const PlanScreen = ({ navigation }) => {
 
   const getUserPlans = async () => {
     const q = query(
-      collection(db, `users/trainer@gmail.com/exercisePlans`),
+      collection(db, `users/${appUser?.trainer}/exercisePlans`),
       where("users", "array-contains", "test01@gmail.com")
     );
 
@@ -124,7 +124,7 @@ const PlanScreen = ({ navigation }) => {
               fontWeight: "bold",
             }}
           >
-            Progressive Bodybuidling
+            {data?.focusPart}
           </Text>
           <Text style={{ color: "#475467" }}>30 days | 2-4 days/week</Text>
         </View>
@@ -136,6 +136,7 @@ const PlanScreen = ({ navigation }) => {
       <PlanDetailModal
         modal={planModalDetailModal}
         setIsModal={setplanModalDetailModal}
+        planDetails={undefined}
       />
       <SwitchTrainerSheet
         modal={switchTrainerModal}
@@ -155,7 +156,12 @@ const PlanScreen = ({ navigation }) => {
             {appUser?.trainer ? (
               <>
                 <Image
-                  style={{ height: 40, width: 40 }}
+                  style={{
+                    height: 40,
+                    width: 40,
+                    marginRight: 10,
+                    borderRadius: 20,
+                  }}
                   source={{ uri: trainerData?.photo }}
                 />
                 <View style={{ marginLeft: 3 }}>
@@ -241,7 +247,7 @@ const PlanScreen = ({ navigation }) => {
 
       <View style={{ marginTop: 20, marginLeft: 20 }}>
         <Text style={{ color: "#026AA2", fontWeight: "bold" }}>
-          Active Plans
+          Custom Plans
         </Text>
       </View>
 

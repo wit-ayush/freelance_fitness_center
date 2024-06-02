@@ -23,6 +23,8 @@ import DiaryLog from "../../components/HomeTabs/DiaryLog";
 import PlanScreen from "../../components/HomeTabs/PlanScreen";
 import UserProfile from "../../components/HomeTabs/UserProfile";
 import TrainerHome from "../../components/HomeTabs/TrainerHome";
+import WorkoutLibrary from "./WorkoutLibrary";
+import MealsScreen from "../../components/HomeTabs/MealsScreen";
 
 const HomeScreen = ({ navigation }) => {
   const { appUser } = useContext(AppContext);
@@ -47,6 +49,12 @@ const HomeScreen = ({ navigation }) => {
     }
     if (activeScreenName == screens.TrainerHome) {
       return <TrainerHome navigation={navigation} />;
+    }
+    if (activeScreenName == screens.WorkoutLibrary) {
+      return <WorkoutLibrary navigation={navigation} />;
+    }
+    if (activeScreenName == screens.MealsScreen) {
+      return <MealsScreen navigation={navigation} />;
     }
   };
 

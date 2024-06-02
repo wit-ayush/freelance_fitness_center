@@ -61,7 +61,7 @@ const PlanDetails = ({ navigation, route }) => {
             borderRadius: 20,
           }}
         >
-          <Text style={{ fontWeight: "bold" }}>Progressive bodybuilding</Text>
+          <Text style={{ fontWeight: "bold" }}>{exercisePlan?.focusPart}</Text>
         </View>
       </ImageBackground>
 

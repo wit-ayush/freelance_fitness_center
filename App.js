@@ -6,8 +6,6 @@ import SplashScreen from "./screens/authentication/SplashScreen";
 import AuthStack from "./screens/authentication/AuthStack";
 import AppProvider from "./context/AppContext";
 import HomeStack from "./screens/home/HomeStack";
-import { ClerkProvider } from "@clerk/clerk-expo";
-import { useAuth } from "@clerk/clerk-expo";
 import { StripeProvider } from "@stripe/stripe-react-native";
 import { screens } from "./utils/constants";
 import PaymentScreen from "./screens/authentication/PaymentScreen";

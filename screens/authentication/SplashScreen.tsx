@@ -29,7 +29,7 @@ const SplashScreen = ({ navigation }) => {
 
         if (jsonValue) {
           setappUser(JSON.parse(jsonValue));
-          await getUser();
+          // await getUser();
 
           await console.log("From Splash", jsonValue);
           navigation.navigate("HomeStack");

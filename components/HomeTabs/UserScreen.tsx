@@ -1,5 +1,6 @@
 import {
   Dimensions,
+  Image,
   ImageBackground,
   SafeAreaView,
   ScrollView,
@@ -14,171 +15,161 @@ import Carousel, { Pagination } from "react-native-snap-carousel";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Progress from "react-native-progress";
 import HomeHeader from "../HomeHeader";
-import { screens } from "../../utils/constants";
+import { images, screens } from "../../utils/constants";
+import SearchExercise from "../SearchExercise";
+import useHealthData from "../../hooks/useHealthData";
 
 const UserScreen = ({ navigation }) => {
-  <HomeHeader navigation={navigation} />;
-  const renderItem = ({ item, index }) => {
+  const HomeCard = ({
+    cardTitle,
+    imageURL,
+  }: {
+    cardTitle: string;
+    imageURL: string;
+  }) => {
     return (
-      <TouchableOpacity>
-        <ImageBackground
-          key={index}
-          style={{
-            height: 150,
-            width: 350,
-            alignSelf: "center",
-            marginTop: 20,
-          }}
-          source={{ uri: item?.imgUrl }}
-        ></ImageBackground>
+      <TouchableOpacity style={{}}>
+        {imageURL && (
+          <Image
+            height={200}
+            width={180}
+            style={{ borderRadius: 10 }}
+            source={{
+              uri: imageURL,
+            }}
+          />
+        )}
+
+        <View style={{ marginTop: 10 }}>
+          <Text style={{ fontWeight: "bold" }}>{cardTitle}</Text>
+        </View>
       </TouchableOpacity>
     );
   };
-  const isCarousel = React.useRef(null);
-  const SLIDER_WIDTH = Dimensions.get("window").width + 80;
 
-  const data = [
-    {
-      title: "Aenean leo",
-      body: "Ut tincidunt tincidunt erat. Sed cursus turpis vitae tortor. Quisque malesuada placerat nisl. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.",
-      imgUrl: "https://picsum.photos/id/11/200/300",
-    },
-    {
-      title: "In turpis",
-      body: "Aenean ut eros et nisl sagittis vestibulum. Donec posuere vulputate arcu. Proin faucibus arcu quis ante. Curabitur at lacus ac velit ornare lobortis. ",
-      imgUrl: "https://picsum.photos/id/10/200/300",
-    },
-    {
-      title: "Lorem Ipsum",
-      body: "Phasellus ullamcorper ipsum rutrum nunc. Nullam quis ante. Etiam ultricies nisi vel augue. Aenean tellus metus, bibendum sed, posuere ac, mattis non, nunc.",
-      imgUrl: "https://picsum.photos/id/12/200/300",
-    },
-  ];
+  const CallCard = () => {
+    return (
+      <ImageBackground
+        style={{
+          padding: 14,
+          alignSelf: "center",
+          width: 280,
+          marginTop: 20,
+        }}
+        source={images.lightblue_bggradeint}
+      >
+        <TouchableOpacity
+          style={{
+            width: "100%",
+            alignSelf: "center",
+            borderRadius: 50,
+          }}
+        >
+          <Text
+            style={{
+              textAlign: "center",
+              fontWeight: "bold",
+              color: "white",
+              fontSize: 17,
+            }}
+          >
+            Schedule a Call
+          </Text>
+        </TouchableOpacity>
+      </ImageBackground>
+    );
+  };
+
+  const StatComponent = ({ text, data }) => {
+    return (
+      <TouchableOpacity
+        style={{
+          backgroundColor: "#E5E4E2",
+          alignSelf: "flex-start",
+          height: 120,
+          padding: 10,
+          width: 150,
+          borderRadius: 20,
+        }}
+      >
+        <Text style={{ fontWeight: "bold", marginTop: 10 }}>{text}</Text>
+        <Text style={{ marginTop: 4, fontSize: 20, fontWeight: "bold" }}>
+          {data}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const { steps, distance, flights } = useHealthData();
+
   return (
     <SafeAreaView style={{ height: "100%" }}>
-      <ScrollView style={{ flex: 1 }}>
+      <ScrollView style={{ width: "100%", height: "100%" }}>
         <HomeHeader navigation={navigation} />
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate(screens.ExerciseSearch);
-          }}
+        <SearchExercise navigation={navigation} />
+        <View
           style={{
-            flexDirection: "row",
-            width: "100%",
             justifyContent: "space-evenly",
+            width: "100%",
+            alignItems: "center",
+            marginTop: 30,
+            flexDirection: "row",
           }}
         >
-          <View
-            style={{
-              borderRadius: 10,
-              borderColor: "#D0D5DD",
-              borderWidth: 1,
-              width: "75%",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <Ionicons
-              name="search-outline"
-              size={30}
-              style={{ marginLeft: 10 }}
-              color={"#667085"}
-            />
-            <Text style={{ color: "gray", marginLeft: 10 }}>Search</Text>
-          </View>
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#F0F9FF",
-              alignSelf: "center",
-              padding: 10,
-              borderRadius: 10,
-            }}
-          >
-            <Ionicons name="filter-outline" size={30} />
-          </TouchableOpacity>
-        </TouchableOpacity>
-
-        <Text
-          style={{
-            marginLeft: 20,
-            marginTop: 20,
-            fontWeight: "600",
-            color: "black",
-            fontSize: 18,
-          }}
-        >
-          Trainer's Latest Updates
-        </Text>
-
-        {/* <View style={{ alignSelf: "center", margin: 0 }}>
-          <Carousel
-            layout="default"
-            layoutCardOffset={10}
-            ref={isCarousel}
-            data={data}
-            renderItem={renderItem}
-            sliderWidth={SLIDER_WIDTH}
-            itemWidth={450}
-            style={{ margin: 0 }}
+          <HomeCard
+            imageURL={
+              "https://plus.unsplash.com/premium_photo-1669261221863-b1221762b4da?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            }
+            cardTitle={"Shop Gym Clothing"}
           />
-        </View> */}
+          <HomeCard
+            imageURL={
+              "https://images.unsplash.com/photo-1709976142411-26dfc86b13fc?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGd5bSUyMHByb3RlaW58ZW58MHx8MHx8fDA%3D"
+            }
+            cardTitle={"Shop Gym Essentials"}
+          />
+        </View>
+        <CallCard />
+
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#E5E4E2",
+            width: "90%",
+            alignSelf: "center",
+            marginTop: 40,
+            padding: 20,
+            borderRadius: 20,
+            justifyContent: "space-between",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontWeight: "bold" }}>
+            Track your Workout Progress
+          </Text>
+          <Ionicons name="chevron-forward" size={20} />
+        </TouchableOpacity>
 
         <View
           style={{
-            backgroundColor: "#26272B",
-            padding: 10,
-            margin: 10,
-            height: 170,
-            borderRadius: 20,
+            flexDirection: "row",
             justifyContent: "space-evenly",
+            marginTop: 30,
           }}
         >
-          <View
-            style={{
-              padding: 4,
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <View>
-              <Text
-                style={{ color: "white", fontSize: 18, fontWeight: "bold" }}
-              >
-                Today's{"\n"}Activities
-              </Text>
-              <Text style={{ color: "white", marginTop: 8 }}>Body Weight</Text>
-            </View>
-            <Progress.Circle
-              size={50}
-              // borderWidth={5}
-              progress={0.5}
-              // borderColor="white"
-              thickness={6}
-              unfilledColor="white"
-            />
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-evenly",
-              marginTop: 5,
-            }}
-          >
-            <View style={{ alignItems: "center" }}>
-              <Text style={{ color: "white" }}>1200 kcal</Text>
-              <Text style={{ color: "white" }}>Calories burned</Text>
-            </View>
-            <View style={{ alignItems: "center" }}>
-              <Text style={{ color: "white" }}>90bpm</Text>
-              <Text style={{ color: "white" }}>Heart Rate</Text>
-            </View>
-            <View style={{ alignItems: "center" }}>
-              <Text style={{ color: "white" }}>90bpm</Text>
-              <Text style={{ color: "white" }}>Heart Rate</Text>
-            </View>
-          </View>
+          <StatComponent text={"Sleep"} data={"10 hours"} />
+          <StatComponent text={"Steps"} data={"5000"} />
         </View>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-evenly",
+            marginTop: 20,
+          }}
+        >
+          <StatComponent text={"Heart Rate"} data={"104 BPM"} />
+          <StatComponent text={"Avg Calories"} data={"1670"} />
+        </View>
+        <View style={{ height: 50 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -186,4 +177,10 @@ const UserScreen = ({ navigation }) => {
 
 export default UserScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  button: {
+    padding: 15,
+    alignItems: "center",
+    borderRadius: 5,
+  },
+});

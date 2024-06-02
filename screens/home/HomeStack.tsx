@@ -11,9 +11,13 @@ import PaymentScreen from "../authentication/PaymentScreen";
 import PaymentConfirmation from "../authentication/PaymentConfirmation";
 import PlanDetails from "./PlanDetails";
 import AddWorkouts from "./AddWorkouts";
+import VideoViewer from "./VideoViewer";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
 
 const HomeStack = () => {
   const Stack = createNativeStackNavigator();
+  const navigation = useNavigation();
 
   return (
     <Stack.Navigator screenOptions={{ gestureEnabled: false }}>
@@ -61,6 +65,27 @@ const HomeStack = () => {
         name={screens.AddWorkouts}
         component={AddWorkouts}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name={screens.VideoView}
+        component={VideoViewer}
+        options={{
+          title: "Learn",
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: "#111",
+          },
+          headerLeft: () => (
+            <View style={{}}>
+              <Ionicons
+                onPress={() => {}}
+                size={25}
+                color={"white"}
+                name="chevron-back"
+              />
+            </View>
+          ),
+        }}
       />
     </Stack.Navigator>
   );

@@ -204,6 +204,7 @@ const DiaryLog = ({ navigation }) => {
                 },
               ],
             });
+
             markedDatesArray.forEach((item) => {
               console.log(item.date.toDateString());
             });

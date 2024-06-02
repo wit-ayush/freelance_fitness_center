@@ -44,3 +44,7 @@ const CustomInput = ({
 export default CustomInput;
 
 const styles = StyleSheet.create({});
+
+// linear-gradient(to top, rgb(254, 202, 202), rgb(252, 165, 165), rgb(254, 240, 138))
+
+// bg-gradient-to-t from-red-200 via-red-300 to-yellow-200

@@ -68,20 +68,49 @@ const CustomBottomNav = ({
           image={images.homeIcon}
         />
         <Icon
-          title={"Diary"}
+          title={"Library"}
           onClick={() => {
-            setActiveScreen(screens.DiaryLog);
+            if (appUser?.isTrainer) {
+              setActiveScreen(screens.TrainerHome);
+            } else {
+              setActiveScreen(screens.WorkoutLibrary);
+            }
           }}
           image={images.diary}
         />
-        <Icon title={"Posts"} image={images.postIcon} />
         <Icon
+          title={"Meals"}
           onClick={() => {
-            setActiveScreen(screens.PlanScreen);
+            if (appUser?.isTrainer) {
+              setActiveScreen(screens.TrainerHome);
+            } else {
+              setActiveScreen(screens.MealsScreen);
+            }
+          }}
+          image={images.meal_bw}
+        />
+        <Icon
+          title={"Diary"}
+          onClick={() => {
+            if (appUser?.isTrainer) {
+              setActiveScreen(screens.TrainerHome);
+            } else {
+              setActiveScreen(screens.DiaryLog);
+            }
+          }}
+          image={images.diary}
+        />
+        {/* <Icon title={"Posts"} image={images.postIcon} /> */}
+        {/* <Icon
+          onClick={() => {
+            if (appUser?.isTrainer) {
+            } else {
+              setActiveScreen(screens.PlanScreen);
+            }
           }}
           title={"Plans"}
           image={images.planIcon}
-        />
+        /> */}
         <Icon
           onClick={() => {
             setActiveScreen(screens.UserProfile);
