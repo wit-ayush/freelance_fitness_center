@@ -24,6 +24,7 @@ export const screens = {
   Recipie: "Recipie",
   MyMeals: "MyMeals",
   VideoView: "VideoView",
+  TrackProgress: "TrackProgess",
 };
 
 export const images = {

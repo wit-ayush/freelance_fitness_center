@@ -17,7 +17,7 @@ import * as Progress from "react-native-progress";
 import HomeHeader from "../HomeHeader";
 import { images, screens } from "../../utils/constants";
 import SearchExercise from "../SearchExercise";
-import useHealthData from "../../hooks/useHealthData";
+import usePedometer from "../../hooks/usePedometer";
 
 const UserScreen = ({ navigation }) => {
   const HomeCard = ({
@@ -53,16 +53,15 @@ const UserScreen = ({ navigation }) => {
         style={{
           padding: 14,
           alignSelf: "center",
-          width: 280,
           marginTop: 20,
+          borderRadius: 20,
         }}
         source={images.lightblue_bggradeint}
       >
         <TouchableOpacity
           style={{
-            width: "100%",
             alignSelf: "center",
-            borderRadius: 50,
+            borderRadius: 20,
           }}
         >
           <Text
@@ -73,7 +72,7 @@ const UserScreen = ({ navigation }) => {
               fontSize: 17,
             }}
           >
-            Schedule a Call
+            Schedule a Call with a Trainer
           </Text>
         </TouchableOpacity>
       </ImageBackground>
@@ -100,7 +99,9 @@ const UserScreen = ({ navigation }) => {
     );
   };
 
-  const { steps, distance, flights } = useHealthData();
+  // const { steps, distance, flights } = useHealthData();
+  // const { isPedometerAvailable, pastStepCount, currentStepCount } =
+  //   usePedometer();
 
   return (
     <SafeAreaView style={{ height: "100%" }}>
@@ -132,6 +133,7 @@ const UserScreen = ({ navigation }) => {
         <CallCard />
 
         <TouchableOpacity
+          onPress={() => navigation.navigate(screens.TrackProgress)}
           style={{
             backgroundColor: "#E5E4E2",
             width: "90%",
@@ -157,7 +159,8 @@ const UserScreen = ({ navigation }) => {
           }}
         >
           <StatComponent text={"Sleep"} data={"10 hours"} />
-          <StatComponent text={"Steps"} data={"5000"} />
+          {/* <StatComponent text={"Steps"} data={currentStepCount} /> */}
+          <StatComponent text={"Steps"} data={"Test"} />
         </View>
         <View
           style={{

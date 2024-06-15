@@ -217,6 +217,10 @@ const UserProfile = ({ navigation }) => {
           }}
         />
         <OptionsBox title={"Sign out"} onClick={signOut} />
+        <OptionsBox
+          title={"Track Progress"}
+          onClick={() => navigation.navigate(screens.TrackProgress)}
+        />
       </View>
     </SafeAreaView>
   );

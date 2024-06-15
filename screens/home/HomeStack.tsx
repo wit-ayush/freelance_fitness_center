@@ -14,6 +14,7 @@ import AddWorkouts from "./AddWorkouts";
 import VideoViewer from "./VideoViewer";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
+import TrackProgress from "./TrackProgress";
 
 const HomeStack = () => {
   const Stack = createNativeStackNavigator();
@@ -64,6 +65,11 @@ const HomeStack = () => {
       <Stack.Screen
         name={screens.AddWorkouts}
         component={AddWorkouts}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name={screens.TrackProgress}
+        component={TrackProgress}
         options={{ headerShown: false }}
       />
       <Stack.Screen

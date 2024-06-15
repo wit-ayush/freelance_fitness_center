@@ -1,0 +1,24 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Users/khushaalchoithramani/Desktop/DesktopFiles/Work/fittness_app/client/ios/client.xcodeproj -configuration Debug -scheme client -destination id=EA24A6F9-8CD9-46B9-9F2E-EDE2B54B1243 DEVELOPMENT_TEAM=RP423FWHCR -allowProvisioningUpdates -allowProvisioningDeviceRegistration
+
+User defaults from command line:
+    IDEPackageSupportUseBuiltinSCM = YES
+
+Build settings from command line:
+    DEVELOPMENT_TEAM = RP423FWHCR
+
+Prepare packages
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (1 target)
+    Target 'client' in project 'client' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+Build description signature: e3bad6db24f9986a5c54ac3d3d9f9c15
+Build description path: /Users/khushaalchoithramani/Library/Developer/Xcode/DerivedData/client-dpbahhcdcnldzgcvxxnkbtqrxqzo/Build/Intermediates.noindex/XCBuildData/e3bad6db24f9986a5c54ac3d3d9f9c15.xcbuilddata
+
+/Users/khushaalchoithramani/Desktop/DesktopFiles/Work/fittness_app/client/ios/Pods/Target Support Files/Pods-client/Pods-client.debug.xcconfig:1:1: error: unable to open configuration settings file
+note: Run script build phase 'Bundle React Native code and images' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'client' from project 'client')
