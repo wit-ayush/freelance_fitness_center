@@ -5,7 +5,7 @@ import { screens } from "../../utils/constants";
 import HomeScreen from "./HomeScreen";
 import Inbox from "./Inbox";
 import ChatScreen from "./ChatScreen";
-import DiaryScreen from "./DiaryScreen";
+
 import ExerciseSearch from "../workoutscreens/ExerciseSearch";
 import PaymentScreen from "../authentication/PaymentScreen";
 import PaymentConfirmation from "../authentication/PaymentConfirmation";
@@ -15,6 +15,7 @@ import VideoViewer from "./VideoViewer";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import TrackProgress from "./TrackProgress";
+import WorkoutLibrary from "./WorkoutLibrary";
 
 const HomeStack = () => {
   const Stack = createNativeStackNavigator();
@@ -37,11 +38,7 @@ const HomeStack = () => {
         component={ChatScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name={screens.Diary}
-        component={DiaryScreen}
-        options={{ headerShown: false }}
-      />
+
       <Stack.Screen
         name={screens.ExerciseSearch}
         component={ExerciseSearch}
@@ -70,6 +67,12 @@ const HomeStack = () => {
       <Stack.Screen
         name={screens.TrackProgress}
         component={TrackProgress}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name={screens.WorkoutLibrary}
+        component={WorkoutLibrary}
         options={{ headerShown: false }}
       />
       <Stack.Screen

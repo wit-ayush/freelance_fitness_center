@@ -1,4 +1,4 @@
-import { ActivityIndicator, Image, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Image, StyleSheet, View } from "react-native";
 import React, { useContext, useEffect } from "react";
 import { BallIndicator } from "react-native-indicators";
 import { useNavigation } from "@react-navigation/native";
@@ -10,15 +10,14 @@ import { db } from "../../utils/firebase";
 
 const SplashScreen = ({ navigation }) => {
   const { appUser, setappUser } = useContext(AppContext);
+  // const navigation = useNavigation();
 
-  const getUser = async () => {
-    if (appUser) {
-      const docRef = doc(db, "users", appUser?.email);
-      const docSnap = await getDoc(docRef);
+  const getUser = async (email) => {
+    const docRef = doc(db, "users", email);
+    const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        await setappUser(docSnap.data());
-      }
+    if (docSnap.exists()) {
+      await setappUser(docSnap.data());
     }
   };
 
@@ -28,19 +27,26 @@ const SplashScreen = ({ navigation }) => {
         const jsonValue = await AsyncStorage.getItem("user");
 
         if (jsonValue) {
-          setappUser(JSON.parse(jsonValue));
-          // await getUser();
+          const user = JSON.parse(jsonValue);
+          setappUser(user);
 
-          await console.log("From Splash", jsonValue);
+          console.log("From Splash", user?.email);
+
+          // Fetch the latest user data from Firebase
+          await getUser(user.email);
+
+          // Navigate to the home screen
           navigation.navigate("HomeStack");
 
           return true;
         }
 
+        // If no user data is found, navigate to the Auth screen
         navigation.navigate(screens.AuthScreen);
         return false;
       } catch (e) {
         console.log(e);
+        navigation.navigate(screens.AuthScreen);
         return false;
       }
     }, 3000);
@@ -58,17 +64,6 @@ const SplashScreen = ({ navigation }) => {
         justifyContent: "center",
       }}
     >
-      <Image
-        style={{
-          alignSelf: "center",
-          position: "absolute",
-          top: -50,
-          left: -40,
-          opacity: 0.7,
-        }}
-        source={require("../../assets/images/splashRunner.png")}
-      />
-
       <Image
         style={{
           alignSelf: "center",

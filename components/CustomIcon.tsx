@@ -12,12 +12,12 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 const CustomIcon = ({
   name,
   onClick,
-  size = 24,
+  size = 30,
   styles,
 }: {
   name: any;
   onClick: any;
-  size: number;
+  size?: number;
   styles: StyleProp<ViewStyle>;
 }) => {
   return (

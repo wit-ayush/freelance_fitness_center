@@ -18,17 +18,16 @@ const CustomBottomNav = ({
     title,
     onClick,
     image,
+    name,
   }: {
     title: string;
-    onClick?: Function;
+    onClick?: any;
     image?: any;
+    name: string;
   }) => {
     return (
       <TouchableOpacity onPress={onClick} style={{ alignItems: "center" }}>
-        <Image
-          style={{ height: 30, width: 30, alignSelf: "center" }}
-          source={image}
-        />
+        <Ionicons size={30} name={name} />
         <Text style={{ marginTop: 4, textAlign: "center" }}>{title}</Text>
       </TouchableOpacity>
     );
@@ -64,9 +63,17 @@ const CustomBottomNav = ({
               setActiveScreen(screens.HomeScreen);
             }
           }}
-          title={"Home"}
-          image={images.homeIcon}
+          name={activeScreen == screens.HomeScreen ? "home" : "home-outline"}
+          title="Home"
         />
+        {/* <Icon
+          title={"Home"}
+          image={
+            activeScreen == screens.HomeScreen
+              ? images.homeIcon
+              : images.home_unfilled
+          }
+        /> */}
         <Icon
           title={"Library"}
           onClick={() => {
@@ -76,7 +83,11 @@ const CustomBottomNav = ({
               setActiveScreen(screens.WorkoutLibrary);
             }
           }}
-          image={images.diary}
+          name={
+            activeScreen == screens.WorkoutLibrary
+              ? "videocam"
+              : "videocam-outline"
+          }
         />
         <Icon
           title={"Meals"}
@@ -87,9 +98,27 @@ const CustomBottomNav = ({
               setActiveScreen(screens.MealsScreen);
             }
           }}
-          image={images.meal_bw}
+          name={
+            activeScreen == screens.MealsScreen
+              ? "restaurant"
+              : "restaurant-outline"
+          }
         />
         <Icon
+          name={
+            activeScreen == screens.PostScreen ? "create" : "create-outline"
+          }
+          title={"Post"}
+          onClick={() => {
+            if (appUser?.isTrainer) {
+              setActiveScreen(screens.TrainerHome);
+            } else {
+              setActiveScreen(screens.PostScreen);
+            }
+          }}
+        />
+        <Icon
+          name={activeScreen == screens.DiaryLog ? "book" : "book-outline"}
           title={"Diary"}
           onClick={() => {
             if (appUser?.isTrainer) {
@@ -98,7 +127,6 @@ const CustomBottomNav = ({
               setActiveScreen(screens.DiaryLog);
             }
           }}
-          image={images.diary}
         />
         {/* <Icon title={"Posts"} image={images.postIcon} /> */}
         {/* <Icon
@@ -111,13 +139,17 @@ const CustomBottomNav = ({
           title={"Plans"}
           image={images.planIcon}
         /> */}
-        <Icon
+        {/* <Icon
           onClick={() => {
             setActiveScreen(screens.UserProfile);
           }}
           title={"Profile"}
-          image={images.profileIcon}
-        />
+          image={
+            activeScreen == screens.UserProfile
+              ? images.profile_filled
+              : images.profileIcon
+          }
+        /> */}
       </View>
     </View>
   );

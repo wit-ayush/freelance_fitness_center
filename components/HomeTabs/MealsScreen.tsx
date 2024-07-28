@@ -21,7 +21,7 @@ const MealsScreen = ({ navigation }) => {
       <View style={{ marginTop: 10 }}>
         <Image
           source={images.fcTextLogo}
-          style={{ height: 13, width: 200, alignSelf: "center" }}
+          style={{ height: 13, width: 140, alignSelf: "center" }}
         />
       </View>
       <View
@@ -77,11 +77,10 @@ export default MealsScreen;
 const styles = StyleSheet.create({
   optionBox: {
     backgroundColor: "lightgray",
-    padding: 10,
-    height: 60,
+    padding: 14,
     width: "30%",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 8,
+    borderRadius: 15,
   },
 });

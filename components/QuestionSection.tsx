@@ -16,7 +16,7 @@ const QuestionSection = ({
   question: string;
   allOptions?: string[];
   setSelectedOption: Function;
-  option: string;
+  option: any;
   textBox?: boolean;
   multiLine?: boolean;
   label?: string;

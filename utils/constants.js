@@ -25,7 +25,10 @@ export const screens = {
   MyMeals: "MyMeals",
   VideoView: "VideoView",
   TrackProgress: "TrackProgess",
+  PostScreen: "PostScreen",
 };
+
+export const Trainer_Email = "trainer@gmail.com";
 
 export const images = {
   googleSignIn: require("../assets/images/google.png"),
@@ -38,11 +41,15 @@ export const images = {
   profileIcon: require("../assets/icons/profile.png"),
   colourFullLogo: require("../assets/images/fittnessCentre.png"),
   headerLogo: require("../assets/images/headerLogo.png"),
-  fcTextLogo: require("../assets/images/fcText.png"),
+  fcTextLogo: require("../assets/images/fcTextLogo1.png"),
   fc: require("../assets/images/fc.png"),
   meal_bw: require("../assets/images/meal_bw.png"),
   fittness: require("../assets/images/fitness.png"),
   lightblue_bggradeint: require("../assets/images/lightblue_bggradeint.jpeg"),
+  profile_filled: require("../assets/images/profile_filled.png"),
+  diary_filled: require("../assets/images/diary_filled.png"),
+  home_unfilled: require("../assets/images/home_unfilled.png"),
+  post_filled: require("../assets/images/post_filled.png"),
 };
 
 export const logWorkouts = [
@@ -99,6 +106,10 @@ export function getChatTimeFormat() {
   const currentTime = `${hours}:${minutes}`;
 
   return currentTime;
+}
+
+export function getRandomInt() {
+  return Math.floor(Math.random() * (1 - 100)) + 1;
 }
 
 export const getBlobFroUri = async (uri) => {
@@ -447,6 +458,8 @@ export const sample_recipes = [
     ],
   },
 ];
+
+export const libraryOptions = ["Workouts", "Nutrition", "Podcasts"];
 export const exercises = [
   {
     id: 1,

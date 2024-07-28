@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Carousel, { Pagination } from "react-native-snap-carousel";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Progress from "react-native-progress";
@@ -18,6 +18,9 @@ import HomeHeader from "../HomeHeader";
 import { images, screens } from "../../utils/constants";
 import SearchExercise from "../SearchExercise";
 import usePedometer from "../../hooks/usePedometer";
+import UserProfile from "./UserProfile";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../utils/firebase";
 
 const UserScreen = ({ navigation }) => {
   const HomeCard = ({
@@ -47,38 +50,6 @@ const UserScreen = ({ navigation }) => {
     );
   };
 
-  const CallCard = () => {
-    return (
-      <ImageBackground
-        style={{
-          padding: 14,
-          alignSelf: "center",
-          marginTop: 20,
-          borderRadius: 20,
-        }}
-        source={images.lightblue_bggradeint}
-      >
-        <TouchableOpacity
-          style={{
-            alignSelf: "center",
-            borderRadius: 20,
-          }}
-        >
-          <Text
-            style={{
-              textAlign: "center",
-              fontWeight: "bold",
-              color: "white",
-              fontSize: 17,
-            }}
-          >
-            Schedule a Call with a Trainer
-          </Text>
-        </TouchableOpacity>
-      </ImageBackground>
-    );
-  };
-
   const StatComponent = ({ text, data }) => {
     return (
       <TouchableOpacity
@@ -88,7 +59,7 @@ const UserScreen = ({ navigation }) => {
           height: 120,
           padding: 10,
           width: 150,
-          borderRadius: 20,
+          borderRadius: 14,
         }}
       >
         <Text style={{ fontWeight: "bold", marginTop: 10 }}>{text}</Text>
@@ -103,66 +74,136 @@ const UserScreen = ({ navigation }) => {
   // const { isPedometerAvailable, pastStepCount, currentStepCount } =
   //   usePedometer();
 
+  const [promoSections, setpromoSections] = useState([]);
+  const getHomePromo = async () => {
+    const promos: any = [];
+    const querySnapshot = await getDocs(collection(db, "home"));
+    querySnapshot.forEach((doc) => {
+      promos.push(doc.data());
+      console.log(doc.id, " => ", doc.data());
+    });
+    setpromoSections(promos);
+  };
+
+  useEffect(() => {
+    getHomePromo();
+  }, []);
+
+  const HomeSectionButton = ({ title, onPress }) => {
+    return (
+      <TouchableOpacity
+        onPress={onPress}
+        style={{
+          backgroundColor: "#E5E4E2",
+          width: "90%",
+          alignSelf: "center",
+          marginTop: 20,
+          padding: 20,
+          borderRadius: 20,
+          justifyContent: "space-between",
+          flexDirection: "row",
+        }}
+      >
+        <Text style={{ fontWeight: "bold" }}>{title}</Text>
+        <Ionicons name="chevron-forward" size={20} />
+      </TouchableOpacity>
+    );
+  };
+  const [showProfileModal, setshowProfileModal] = useState(false);
   return (
     <SafeAreaView style={{ height: "100%" }}>
+      {showProfileModal && (
+        <UserProfile
+          setShowUserProfile={setshowProfileModal}
+          showUserProfile={showProfileModal}
+          navigation={navigation}
+        />
+      )}
       <ScrollView style={{ width: "100%", height: "100%" }}>
-        <HomeHeader navigation={navigation} />
-        <SearchExercise navigation={navigation} />
+        <HomeHeader
+          onImagePress={() => setshowProfileModal(true)}
+          navigation={navigation}
+        />
+        <View style={{ marginLeft: 20, marginTop: 10 }}>
+          <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+            Hey Khushaal, Good Morning!
+          </Text>
+        </View>
+        <Text
+          style={{
+            fontWeight: "bold",
+            fontSize: 16,
+            marginLeft: 20,
+            marginTop: 18,
+          }}
+        >
+          New Arrivals
+        </Text>
         <View
           style={{
             justifyContent: "space-evenly",
             width: "100%",
             alignItems: "center",
-            marginTop: 30,
+            marginTop: 10,
             flexDirection: "row",
           }}
         >
-          <HomeCard
-            imageURL={
-              "https://plus.unsplash.com/premium_photo-1669261221863-b1221762b4da?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            }
-            cardTitle={"Shop Gym Clothing"}
+          {promoSections &&
+            promoSections?.map((data, i) => {
+              return (
+                <HomeCard
+                  key={i}
+                  imageURL={data?.img}
+                  cardTitle={data?.title}
+                />
+              );
+            })}
+        </View>
+        {/* <CallCard /> */}
+
+        <View style={{ marginTop: 40 }}>
+          <Text
+            style={{
+              fontWeight: "bold",
+              fontSize: 16,
+              marginLeft: 20,
+              marginTop: 18,
+            }}
+          >
+            Quick Actions
+          </Text>
+          <HomeSectionButton
+            title={"Track all your workout progress"}
+            onPress={() => navigation.navigate(screens.TrackProgress)}
           />
-          <HomeCard
-            imageURL={
-              "https://images.unsplash.com/photo-1709976142411-26dfc86b13fc?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGd5bSUyMHByb3RlaW58ZW58MHx8MHx8fDA%3D"
-            }
-            cardTitle={"Shop Gym Essentials"}
+          <HomeSectionButton
+            title={"Schedule a call with an Expert"}
+            onPress={undefined}
           />
         </View>
-        <CallCard />
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate(screens.TrackProgress)}
+        <Text
           style={{
-            backgroundColor: "#E5E4E2",
-            width: "90%",
-            alignSelf: "center",
-            marginTop: 40,
-            padding: 20,
-            borderRadius: 20,
-            justifyContent: "space-between",
-            flexDirection: "row",
+            fontWeight: "bold",
+            fontSize: 16,
+            marginLeft: 20,
+            marginTop: 30,
           }}
         >
-          <Text style={{ fontWeight: "bold" }}>
-            Track your Workout Progress
-          </Text>
-          <Ionicons name="chevron-forward" size={20} />
-        </TouchableOpacity>
-
+          Track
+        </Text>
         <View
           style={{
             flexDirection: "row",
-            justifyContent: "space-evenly",
-            marginTop: 30,
+            marginLeft: 20,
+            marginTop: 10,
           }}
         >
-          <StatComponent text={"Sleep"} data={"10 hours"} />
           {/* <StatComponent text={"Steps"} data={currentStepCount} /> */}
           <StatComponent text={"Steps"} data={"Test"} />
+          {/* <StatComponent text={"Avg Calories"} data={"1670"} /> */}
         </View>
-        <View
+        {/* <View
           style={{
             flexDirection: "row",
             justifyContent: "space-evenly",
@@ -171,7 +212,7 @@ const UserScreen = ({ navigation }) => {
         >
           <StatComponent text={"Heart Rate"} data={"104 BPM"} />
           <StatComponent text={"Avg Calories"} data={"1670"} />
-        </View>
+        </View> */}
         <View style={{ height: 50 }} />
       </ScrollView>
     </SafeAreaView>

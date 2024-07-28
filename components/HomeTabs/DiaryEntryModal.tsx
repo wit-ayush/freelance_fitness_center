@@ -56,45 +56,7 @@ const DiaryEntryModal = ({
 
   const { appUser } = useContext(AppContext);
 
-  const MET_VALUES = {
-    running: 8,
-    weightlifting: {
-      chest: 3.5,
-      biceps: 3,
-      back: 3.5,
-      triceps: 3,
-      legs: 4,
-      // Add more workouts and their MET values as needed
-    },
-    // Add more exercises and their MET values as needed
-  };
-
-  function calculateCaloriesBurnt(exercise, bodyWeight, durationInMinutes) {
-    const lowerCaseExercise = exercise.toLowerCase();
-    let MET;
-
-    // Check if the exercise is a specific weightlifting exercise
-    if (
-      MET_VALUES["weightlifting"] &&
-      MET_VALUES["weightlifting"][lowerCaseExercise]
-    ) {
-      MET = MET_VALUES["weightlifting"][lowerCaseExercise];
-    } else {
-      MET = MET_VALUES[lowerCaseExercise];
-    }
-
-    if (!MET) {
-      console.error("MET value not found for the provided exercise.");
-      return null;
-    }
-
-    const durationInHours = durationInMinutes / 60;
-    const caloriesBurnt = MET * bodyWeight * durationInHours;
-    return caloriesBurnt;
-  }
-
   const saveWorkoutLog = async () => {
-    const database = getDatabase();
     if (clickedData) {
       await updateDoc(
         doc(db, `workoutlogs/${appUser?.email}/logs`, clickedData?.id),
@@ -103,7 +65,7 @@ const DiaryEntryModal = ({
           durationOfWorkout: workoutDuration,
           setsPerformed: setsPerformed,
           repsPerformed: repsPerformed,
-          dateSelect: dateSelected.toDateString(),
+          dateSelect: dateSelected,
           calorieBurnt: 90,
           startTime: startTime,
           endTime: endTime,

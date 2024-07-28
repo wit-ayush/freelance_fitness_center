@@ -9,9 +9,11 @@ const CustomInput = ({
   onChangeText,
   multiLine = false,
   type = "default",
+  editable = true,
+  mt = 30,
 }) => {
   return (
-    <View style={{ marginTop: 30 }}>
+    <View style={{ marginTop: mt }}>
       <Text style={{ marginLeft: 12, marginBottom: 10, fontSize: 15 }}>
         {label}
       </Text>
@@ -35,6 +37,7 @@ const CustomInput = ({
           multiline={multiLine}
           keyboardType={type}
           autoFocus={autofocus}
+          editable={editable}
         />
       </View>
     </View>

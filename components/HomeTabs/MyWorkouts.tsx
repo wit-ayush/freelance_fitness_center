@@ -1,14 +1,10 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-const DiaryScreen = () => {
-  return (
-    <View>
-      <Text>DiaryScreen</Text>
-    </View>
-  );
+const MyWorkouts = () => {
+  return <View></View>;
 };
 
-export default DiaryScreen;
+export default MyWorkouts;
 
 const styles = StyleSheet.create({});

@@ -2,6 +2,7 @@ import {
   FlatList,
   Image,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -32,27 +33,23 @@ const Recipies = () => {
             width: 180,
             alignItems: "center",
             justifyContent: "center",
-            borderWidth: 1,
-            borderRadius: 10,
           }}
         >
           <Image
             style={{
-              height: 100,
-              width: 100,
+              height: 200,
+              width: 180,
               alignSelf: "center",
               borderRadius: 10,
             }}
             source={{
-              uri: "https://cdn-icons-png.flaticon.com/128/2276/2276931.png",
+              uri: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=2960&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
             }}
           />
         </View>
         <View
           style={{
-            position: "absolute",
             alignSelf: "center",
-            bottom: 0,
             width: 180,
             borderBottomLeftRadius: 10,
             borderBottomRightRadius: 10,
@@ -111,6 +108,7 @@ const Recipies = () => {
         style={{
           marginTop: 20,
           alignSelf: "center",
+          flex: 1,
         }}
       >
         <FlatList
@@ -120,7 +118,7 @@ const Recipies = () => {
           numColumns={2}
         />
       </View>
-      {/* <View style={{ height: 200 }} /> */}
+      <View style={{ height: 50 }} />
     </SafeAreaView>
   );
 };

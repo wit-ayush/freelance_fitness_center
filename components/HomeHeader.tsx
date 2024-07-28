@@ -1,11 +1,11 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useContext } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { screens } from "../utils/constants";
+import { images, screens } from "../utils/constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AppContext } from "../context/AppContext";
 
-const HomeHeader = ({ navigation }) => {
+const HomeHeader = ({ navigation, onImagePress }) => {
   const { appUser } = useContext(AppContext);
 
   const signOut = async () => {
@@ -23,15 +23,27 @@ const HomeHeader = ({ navigation }) => {
         alignItems: "center",
       }}
     >
-      <TouchableOpacity>
+      <TouchableOpacity onPress={onImagePress}>
         {appUser && appUser?.photo && (
           <Image
             source={{ uri: appUser?.photo }}
-            style={{ height: 50, width: 50, borderRadius: 25 }}
+            style={{
+              height: 50,
+              width: 50,
+              borderRadius: 25,
+              borderWidth: 2,
+              borderColor: "lightgray",
+            }}
           />
         )}
       </TouchableOpacity>
       {/* <Text style={{ fontWeight: "bold", fontSize: 17 }}>{appUser?.email}</Text> */}
+      <View style={{}}>
+        <Image
+          source={images.fcTextLogo}
+          style={{ height: 10, width: 130, alignSelf: "center" }}
+        />
+      </View>
       <View style={{ flexDirection: "row" }}>
         <TouchableOpacity
           onPress={() => {
@@ -41,6 +53,7 @@ const HomeHeader = ({ navigation }) => {
         >
           <Ionicons color={"black"} size={27} name="chatbox-ellipses-outline" />
         </TouchableOpacity>
+
         <TouchableOpacity style={{}}>
           <Ionicons size={27} name="notifications-outline" />
         </TouchableOpacity>

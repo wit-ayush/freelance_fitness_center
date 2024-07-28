@@ -1,5 +1,6 @@
 import {
   Image,
+  RefreshControl,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -24,17 +25,25 @@ const DiaryLog = ({ navigation }) => {
   const [dateTapped, setdateTapped] = useState<Date>(new Date());
 
   const [userWorkoutLog, setuserWorkoutLog] = useState([]);
+  const [trainerWorkoutLog, settrainerWorkoutLog] = useState([]);
 
   const { appUser } = useContext(AppContext);
   const [clickedData, setclickedData] = useState(undefined);
+  const [sectionSelected, setsectionSelected] = useState<"diary" | "workout">(
+    "diary"
+  );
 
   useEffect(() => {
     getAllWorkoutLogs();
+    getTrainerLogs();
+  }, []);
+
+  useEffect(() => {
     if (clickedData) {
-      // console.log("From useefect", clickedData);
       setModalVisible(true);
     }
   }, [clickedData]);
+
   // console.log(dateTapped.toDateString());
 
   const getAllWorkoutLogs = async () => {
@@ -43,11 +52,33 @@ const DiaryLog = ({ navigation }) => {
     const querySnapshot = await getDocs(query);
     querySnapshot.forEach(async (doc) => {
       await workoutLogs.push({ id: doc.id, ...doc.data() });
-      console.log(doc.id);
+      console.log(doc.data());
     });
     setuserWorkoutLog(workoutLogs);
     // console.log(workoutLogs);
   };
+
+  const getTrainerLogs = async () => {
+    const workoutLogs = [];
+    const query = collection(db, `workoutlogs/${appUser?.email}/trainerLog`);
+    const querySnapshot = await getDocs(query);
+    querySnapshot.forEach(async (doc) => {
+      await workoutLogs.push({ id: doc.id, ...doc.data() });
+      console.log(doc.data());
+    });
+    settrainerWorkoutLog(workoutLogs);
+    // console.log(workoutLogs);
+  };
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(async () => {
+      await getAllWorkoutLogs();
+      await getTrainerLogs();
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   const LogComponent = ({ data }) => {
     return (
@@ -70,7 +101,9 @@ const DiaryLog = ({ navigation }) => {
           <Text style={{ fontWeight: "bold", fontSize: 15 }}>
             {data?.startTime}
           </Text>
-          <View style={styles.verticalLine} />
+          {data?.startTime && data?.endTime && (
+            <View style={styles.verticalLine} />
+          )}
           <Text style={{ fontWeight: "bold", fontSize: 15 }}>
             {data?.endTime}
           </Text>
@@ -128,7 +161,7 @@ const DiaryLog = ({ navigation }) => {
             <Text> Reps : {data?.repsPerformed}</Text>
           </View>
 
-          <View
+          {/* <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
@@ -146,7 +179,7 @@ const DiaryLog = ({ navigation }) => {
               <Text>90bpm</Text>
               <Text>Heart Rate</Text>
             </View>
-          </View>
+          </View> */}
         </TouchableOpacity>
       </View>
     );
@@ -216,51 +249,68 @@ const DiaryLog = ({ navigation }) => {
       </Text>
       <View style={styles.horizontalLine} />
 
-      <View>
-        <View style={{ flexDirection: "row", marginLeft: 10 }}>
-          <Text style={{ color: "#667085", fontWeight: "500", fontSize: 14 }}>
-            Time
-          </Text>
-          <Text
+      <View style={{ justifyContent: "center", alignItems: "center" }}>
+        <View
+          style={{
+            width: "60%",
+            // alignSelf: "center",
+            flexDirection: "row",
+            backgroundColor: "lightgray",
+            justifyContent: "space-evenly",
+
+            padding: 5,
+            borderRadius: 20,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              setsectionSelected("diary");
+            }}
             style={{
-              color: "#667085",
-              fontWeight: "500",
-              fontSize: 14,
-              marginLeft: 20,
+              backgroundColor:
+                sectionSelected == "diary" ? "white" : "transparent",
+              padding: 2,
+              borderRadius: 8,
+              paddingHorizontal: 4,
             }}
           >
-            Exercise
-          </Text>
+            <Text style={{ fontWeight: "bold" }}>Diary</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setsectionSelected("workout");
+            }}
+            style={{
+              backgroundColor:
+                sectionSelected == "workout" ? "white" : "transparent",
+              padding: 2,
+              borderRadius: 8,
+              paddingHorizontal: 4,
+            }}
+          >
+            <Text style={{ fontWeight: "bold" }}>Workouts</Text>
+          </TouchableOpacity>
         </View>
-        <ScrollView style={{ height: "100%" }}>
-          {/* {userWorkoutLog &&
-            userWorkoutLog.map((data, i) => {
-              if (dateTapped.toDateString() == data.dateSelect) {
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          style={{ width: "100%" }}
+        >
+          {userWorkoutLog &&
+            sectionSelected == "diary" &&
+            userWorkoutLog?.map((data, i) => {
+              if (data?.dateSelect == new Date(dateTapped).toDateString()) {
                 return <LogComponent data={data} key={i} />;
-              } else {
-                return (
-                  <View
-                    style={{ height: "100%", justifyContent: "center" }}
-                    key={i}
-                  >
-                    <Text
-                      style={{
-                        textAlign: "center",
-                        fontWeight: "bold",
-                        fontSize: 18,
-                      }}
-                    >
-                      No Logs
-                    </Text>
-                  </View>
-                );
               }
-            })} */}
-          {userWorkoutLog.map((data, i) => {
-            if (data.dateSelect == dateTapped.toDateString()) {
-              return <LogComponent data={data} key={i} />;
-            }
-          })}
+            })}
+          {trainerWorkoutLog &&
+            sectionSelected == "workout" &&
+            trainerWorkoutLog?.map((data, i) => {
+              if (data?.dateSelect == new Date(dateTapped).toDateString()) {
+                return <LogComponent data={data} key={i} />;
+              }
+            })}
           <View style={{ height: 100 }} />
         </ScrollView>
       </View>

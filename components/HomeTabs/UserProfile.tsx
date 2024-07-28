@@ -17,8 +17,10 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { getBlobFroUri, screens } from "../../utils/constants";
 import { useStripe } from "@stripe/stripe-react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import EditProfileSheet from "../CustomComponents/EditProfileSheet";
+import CustomIcon from "../CustomIcon";
 
-const UserProfile = ({ navigation }) => {
+const UserProfile = ({ navigation, showUserProfile, setShowUserProfile }) => {
   const { appUser, getUser, setappUser } = useContext(AppContext);
   const signOut = async () => {
     await AsyncStorage.removeItem("user");
@@ -29,7 +31,8 @@ const UserProfile = ({ navigation }) => {
       navigation.navigate(screens.AuthScreen);
     }
   }, [appUser, setappUser]);
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState(appUser?.photo);
+
   const pickImage = async () => {
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
@@ -50,7 +53,7 @@ const UserProfile = ({ navigation }) => {
       await uploadBytes(imageRef, imageBlob)
         .then(async (snapshot) => {
           const downloadURL = await getDownloadURL(imageRef);
-          // await console.log(downloadURL);
+          console.log(downloadURL);
           await updateDoc(doc(db, "users", appUser?.email), {
             photo: downloadURL,
           });
@@ -67,7 +70,7 @@ const UserProfile = ({ navigation }) => {
     }
   };
 
-  const OptionsBox = ({ onClick, title }) => {
+  const OptionsBox = ({ onClick, title, iconName }) => {
     return (
       <TouchableOpacity
         onPress={onClick}
@@ -91,7 +94,7 @@ const UserProfile = ({ navigation }) => {
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Ionicons name="heart-outline" size={25} />
+          <Ionicons name={iconName} size={25} />
           <Text style={{ marginLeft: 10, fontWeight: "bold", fontSize: 15 }}>
             {title}
           </Text>
@@ -141,6 +144,7 @@ const UserProfile = ({ navigation }) => {
     );
   };
 
+  const [showEditProfileSheet, setshowEditProfileSheet] = useState(false);
   return (
     <SafeAreaView
       style={{
@@ -149,22 +153,33 @@ const UserProfile = ({ navigation }) => {
         backgroundColor: "white",
       }}
     >
-      <View style={{ marginTop: 10 }}>
+      <EditProfileSheet
+        setModal={setshowEditProfileSheet}
+        modal={showEditProfileSheet}
+      />
+      <View style={{ marginLeft: 10 }}>
+        <CustomIcon
+          name={"close-outline"}
+          onClick={() => setShowUserProfile(false)}
+          styles={false}
+        />
+      </View>
+      {/* <View style={{ marginTop: 10 }}>
         <Text style={{ textAlign: "center", fontWeight: "bold", fontSize: 20 }}>
           Profile
         </Text>
-      </View>
+      </View> */}
 
       <View style={{ alignSelf: "center", marginTop: 30 }}>
-        <TouchableOpacity
-          onPress={async () => {
-            await pickImage();
-          }}
-        >
-          {appUser && appUser?.photo ? (
+        <TouchableOpacity>
+          {image ? (
             <Image
-              style={{ height: 70, width: 70, borderRadius: 35 }}
-              source={{ uri: appUser?.photo }}
+              style={{
+                height: 100,
+                width: 100,
+                borderRadius: 35,
+              }}
+              source={{ uri: image }}
             />
           ) : (
             <View
@@ -196,7 +211,7 @@ const UserProfile = ({ navigation }) => {
         </Text>
       </View>
 
-      <View
+      {/* <View
         style={{
           marginTop: 20,
           flexDirection: "row",
@@ -206,18 +221,30 @@ const UserProfile = ({ navigation }) => {
         <DataBox />
         <DataBox />
         <DataBox />
-      </View>
+      </View> */}
 
       <View style={{ marginTop: 20, justifyContent: "center" }}>
-        <OptionsBox title={"Edit Profile"} onClick={async () => {}} />
         <OptionsBox
+          title={"Edit Profile"}
+          onClick={async () => {
+            setshowEditProfileSheet(true);
+          }}
+          iconName={"person-outline"}
+        />
+        <OptionsBox
+          iconName={"card-outline"}
           title={"Subscribe"}
           onClick={() => {
             navigation.navigate(screens.Payment);
           }}
         />
-        <OptionsBox title={"Sign out"} onClick={signOut} />
         <OptionsBox
+          iconName={"lock-closed-outline"}
+          title={"Sign out"}
+          onClick={signOut}
+        />
+        <OptionsBox
+          iconName={"stats-chart-outline"}
           title={"Track Progress"}
           onClick={() => navigation.navigate(screens.TrackProgress)}
         />

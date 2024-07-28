@@ -1,6 +1,7 @@
 import {
   FlatList,
   Image,
+  RefreshControl,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -8,30 +9,53 @@ import {
   View,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { DATA, exercises, images } from "../../utils/constants";
-import LibraryModal from "../../components/LibraryModal";
-import SearchExercise from "../../components/SearchExercise";
-import CustomIcon from "../../components/CustomIcon";
+import LibraryModal from "../components/LibraryModal";
+import { exercises, images, libraryOptions, screens } from "../utils/constants";
+import SearchExercise from "../components/SearchExercise";
+import { collection, doc, getDocs } from "firebase/firestore";
+import { db } from "../utils/firebase";
 
-const WorkoutLibrary = ({ navigation, route }) => {
+const Library = ({ navigation }) => {
+  const [refreshing, setRefreshing] = React.useState(false);
+
   const [libraryModal, setlibraryModal] = useState(false);
   const [exerciseDataModal, setexerciseDataModal] = useState(null);
-
-  const sectionsData = route?.params?.data;
-  console.log(sectionsData);
-
-  const [selectedItem, setselectedItem] = useState();
-
   useEffect(() => {
-    if (selectedItem) {
+    if (exerciseDataModal) {
       setlibraryModal(true);
     }
-  }, [selectedItem]);
+  }, [exerciseDataModal]);
+
+  const [settingOptions, setsettingOptions] = useState([]);
+
+  const getSettings = async () => {
+    const settings: any = [];
+    const querySnapshot = await getDocs(collection(db, "settings"));
+    querySnapshot.forEach((doc) => {
+      settings.push(doc.data());
+      console.log(doc.id, " => ", doc.data());
+    });
+    setsettingOptions(settings);
+  };
+
+  useEffect(() => {
+    getSettings();
+  }, []);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(async () => {
+      await getSettings();
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   const OptionComponent = ({ item }) => {
     return (
       <TouchableOpacity
-        onPress={() => setselectedItem(item)}
+        onPress={() =>
+          navigation.navigate(screens.WorkoutLibrary, { data: item })
+        }
         style={{
           borderRadius: 10,
           alignSelf: "flex-start",
@@ -58,7 +82,7 @@ const WorkoutLibrary = ({ navigation, route }) => {
               borderRadius: 10,
             }}
             source={{
-              uri: item?.thumbnailURL,
+              uri: item?.sectionThumbnail,
             }}
           />
         </View>
@@ -74,7 +98,7 @@ const WorkoutLibrary = ({ navigation, route }) => {
           }}
         >
           <Text style={{ textAlign: "center", fontWeight: "bold" }}>
-            {item.sectionName?.toUpperCase()}
+            {item?.name}
           </Text>
         </View>
       </TouchableOpacity>
@@ -82,31 +106,19 @@ const WorkoutLibrary = ({ navigation, route }) => {
   };
   return (
     <SafeAreaView style={{ height: "100%", backgroundColor: "white", flex: 1 }}>
-      <LibraryModal
+      {/* <LibraryModal
         navigation={navigation}
         exerciseDataModal={exerciseDataModal}
         setexerciseDataModal={setexerciseDataModal}
         modal={libraryModal}
         setModal={setlibraryModal}
-        selectedItem={selectedItem}
-        setselectedItem={setselectedItem}
-      />
+      /> */}
 
       <View style={{ marginTop: 10 }}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <CustomIcon
-            onClick={() => navigation.goBack()}
-            name={"chevron-back"}
-            styles={{ marginLeft: 0 }}
-          />
-          <Text style={{ marginLeft: 2, color: "blue" }}>
-            {sectionsData?.name}
-          </Text>
-        </View>
-        {/* <Image
+        <Image
           source={images.fcTextLogo}
-          style={{ height: 13, width: 200, alignSelf: "center" }}
-        /> */}
+          style={{ height: 13, width: 140, alignSelf: "center" }}
+        />
       </View>
       {/* <View style={{ marginTop: 30 }}>
         <SearchExercise navigation={navigation} />
@@ -116,26 +128,24 @@ const WorkoutLibrary = ({ navigation, route }) => {
         style={{
           marginTop: 10,
           alignSelf: "center",
-          justifyContent: "center",
-          height: "100%",
         }}
       >
-        {sectionsData?.inSections?.length > 0 ? (
-          <FlatList
-            data={sectionsData?.inSections}
-            renderItem={({ item }) => <OptionComponent item={item} />}
-            keyExtractor={(item) => item?.name}
-            numColumns={2}
-          />
-        ) : (
-          <Text style={{}}>The Section is Empty</Text>
-        )}
+        <FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          // onRefresh={getSettings}
+          data={settingOptions}
+          renderItem={({ item }) => <OptionComponent item={item} />}
+          keyExtractor={(item) => item?.id}
+          numColumns={2}
+        />
       </View>
       {/* <View style={{ height: 200 }} /> */}
     </SafeAreaView>
   );
 };
 
-export default WorkoutLibrary;
+export default Library;
 
 const styles = StyleSheet.create({});

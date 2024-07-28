@@ -25,6 +25,8 @@ import UserProfile from "../../components/HomeTabs/UserProfile";
 import TrainerHome from "../../components/HomeTabs/TrainerHome";
 import WorkoutLibrary from "./WorkoutLibrary";
 import MealsScreen from "../../components/HomeTabs/MealsScreen";
+import Post from "../../components/Post";
+import Library from "../Library";
 
 const HomeScreen = ({ navigation }) => {
   const { appUser } = useContext(AppContext);
@@ -44,17 +46,20 @@ const HomeScreen = ({ navigation }) => {
     if (activeScreenName == screens.PlanScreen) {
       return <PlanScreen navigation={navigation} />;
     }
-    if (activeScreenName == screens.UserProfile) {
-      return <UserProfile navigation={navigation} />;
-    }
+    // if (activeScreenName == screens.UserProfile) {
+    //   return <UserProfile navigation={navigation} />;
+    // }
     if (activeScreenName == screens.TrainerHome) {
       return <TrainerHome navigation={navigation} />;
     }
     if (activeScreenName == screens.WorkoutLibrary) {
-      return <WorkoutLibrary navigation={navigation} />;
+      return <Library navigation={navigation} />;
     }
     if (activeScreenName == screens.MealsScreen) {
       return <MealsScreen navigation={navigation} />;
+    }
+    if (activeScreenName == screens.PostScreen) {
+      return <Post navigation={navigation} />;
     }
   };
 

@@ -1,4 +1,11 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React from "react";
 
 const MyMeals = () => {
@@ -30,7 +37,7 @@ const MyMeals = () => {
           style={{
             backgroundColor: "white",
             width: "100%",
-            marginTop: 2,
+            marginTop: 10,
           }}
         >
           <Text
@@ -49,48 +56,51 @@ const MyMeals = () => {
   };
 
   return (
-    <View>
-      <Text
-        style={{
-          fontSize: 18,
-          marginTop: 30,
-          marginLeft: 20,
-          fontWeight: "bold",
-        }}
-      >
-        Your Macros Target
-      </Text>
-
-      <View
-        style={{
-          alignSelf: "center",
-          width: "80%",
-          marginTop: 9,
-          borderWidth: 0.5,
-          borderColor: "gray",
-          padding: 10,
-          borderRadius: 10,
-        }}
-      >
-        <View
+    <ScrollView>
+      <View>
+        <Text
           style={{
-            flexDirection: "row",
-            justifyContent: "space-evenly",
-            width: "100%",
+            fontSize: 18,
+            marginTop: 30,
+            marginLeft: 20,
+            fontWeight: "bold",
           }}
         >
-          <MacrosBox text={"Protein"} data={100} />
-          <View style={styles.verticalLine} />
-          <MacrosBox text={"Carbs"} data={100} />
-          <View style={styles.verticalLine} />
+          Your Macros Target
+        </Text>
 
-          <MacrosBox text={"Fats"} data={100} />
+        <View
+          style={{
+            alignSelf: "center",
+            width: "80%",
+            marginTop: 9,
+            borderWidth: 0.5,
+            borderColor: "gray",
+            padding: 10,
+            borderRadius: 10,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              width: "100%",
+            }}
+          >
+            <MacrosBox text={"Protein"} data={100} />
+            <View style={styles.verticalLine} />
+            <MacrosBox text={"Carbs"} data={100} />
+            <View style={styles.verticalLine} />
+
+            <MacrosBox text={"Fats"} data={100} />
+          </View>
         </View>
+        <FoodBox mealType={"Breakfast"} />
+        <FoodBox mealType={"Lunch"} />
+        <FoodBox mealType={"Dinner"} />
+        <View style={{ height: 20 }} />
       </View>
-      <FoodBox mealType={"Breakfast"} />
-      <FoodBox mealType={"Lunch"} />
-      <FoodBox mealType={"Dinner"} />
-    </View>
+    </ScrollView>
   );
 };
 

@@ -2,6 +2,7 @@ import {
   Image,
   KeyboardAvoidingView,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -24,11 +25,11 @@ const QuestionScreen = ({ navigation }) => {
 
   const [gender, setgender] = useState("");
   const [age, setage] = useState();
-  const [height, setheight] = useState();
-  const [Weight, setWeight] = useState();
+  const [height, setheight] = useState<number>();
+  const [weight, setweight] = useState<number>();
   const [trainingGoal, settrainingGoal] = useState("");
-  const [sleepHours, setsleepHours] = useState();
-  const [trainingHours, settrainingHours] = useState();
+  const [sleepHours, setsleepHours] = useState<number>();
+  const [trainingHours, settrainingHours] = useState<number>();
   const [allergies, setallergies] = useState();
   return (
     <SafeAreaView
@@ -46,7 +47,7 @@ const QuestionScreen = ({ navigation }) => {
           style={{
             textAlign: "right",
             fontSize: 13,
-            fontWeight: "bold",
+            fontweight: "bold",
             marginRight: 10,
             textDecorationLine: "underline",
           }}
@@ -71,86 +72,88 @@ const QuestionScreen = ({ navigation }) => {
           />
         </View>
 
-        {questionNumber == 0 && (
-          <QuestionSection
-            question="What is your Gender?"
-            allOptions={["Male", "Female"]}
-            setSelectedOption={setgender}
-            option={gender}
-          />
-        )}
-        {questionNumber == 1 && (
-          <QuestionSection
-            question="What is your age?"
-            setSelectedOption={setage}
-            option={age}
-            keyboardType="numeric"
-            textBox
-            placeholder="Enter Your Age"
-          />
-        )}
-        {questionNumber == 2 && (
-          <>
+        <ScrollView keyboardDismissMode="on-drag">
+          {questionNumber == 0 && (
             <QuestionSection
-              question="How much do you weigh?"
-              setSelectedOption={setWeight}
-              option={Weight}
+              question="What is your Gender?"
+              allOptions={["Male", "Female"]}
+              setSelectedOption={setgender}
+              option={gender}
+            />
+          )}
+          {questionNumber == 1 && (
+            <QuestionSection
+              question="What is your age?"
+              setSelectedOption={setage}
+              option={age}
               keyboardType="numeric"
               textBox
-              placeholder="Enter Your Weight"
+              placeholder="Enter Your Age"
             />
+          )}
+          {questionNumber == 2 && (
+            <>
+              <QuestionSection
+                question="How much do you weigh?"
+                setSelectedOption={(text: string) => setweight(parseInt(text))}
+                option={weight}
+                keyboardType="numeric"
+                textBox
+                placeholder="Enter Your weight"
+              />
+              <QuestionSection
+                question="How tall are you?"
+                setSelectedOption={(text) => setheight(parseInt(text))}
+                option={height}
+                keyboardType="numeric"
+                textBox
+                placeholder="Enter Your Height (in cm)"
+              />
+            </>
+          )}
+          {questionNumber == 3 && (
             <QuestionSection
-              question="How tall are you?"
-              setSelectedOption={setheight}
-              option={height}
-              keyboardType="numeric"
-              textBox
-              placeholder="Enter Your Height"
+              question="What is your Main Goal for training?"
+              allOptions={[
+                "Gain Muscle",
+                "Lose Body Fat",
+                "Improve Indurance",
+                "Increase Strength",
+              ]}
+              setSelectedOption={settrainingGoal}
+              option={trainingGoal}
             />
-          </>
-        )}
-        {questionNumber == 3 && (
-          <QuestionSection
-            question="What is your Main Goal for training?"
-            allOptions={[
-              "Gain Muscle",
-              "Lose Body Fat",
-              "Improve Indurance",
-              "Increase Strength",
-            ]}
-            setSelectedOption={settrainingGoal}
-            option={trainingGoal}
-          />
-        )}
-        {questionNumber == 4 && (
-          <>
-            <QuestionSection
-              question="How many hours can you put inn?"
-              setSelectedOption={settrainingHours}
-              option={trainingHours}
-              keyboardType="numeric"
-              textBox
-              placeholder="Enter hours"
-            />
-            <QuestionSection
-              question="How many hours do you sleep?"
-              setSelectedOption={setsleepHours}
-              option={sleepHours}
-              keyboardType="numeric"
-              textBox
-              placeholder="Enter Sleeping hours"
-            />
-            <QuestionSection
-              question="Any Allergies? Please Describe"
-              setSelectedOption={setallergies}
-              option={allergies}
-              textBox
-              placeholder="Describe about your allergies (if they exist)"
-              multiLine={true}
-            />
-          </>
-        )}
-        {questionNumber == 5 && <></>}
+          )}
+          {questionNumber == 4 && (
+            <>
+              <QuestionSection
+                question="How many hours can you put inn?"
+                setSelectedOption={(text) => settrainingHours(parseInt(text))}
+                option={trainingHours}
+                keyboardType="numeric"
+                textBox
+                placeholder="Enter hours"
+              />
+              <QuestionSection
+                question="How many hours do you sleep?"
+                setSelectedOption={(text) => setsleepHours(parseInt(text))}
+                option={sleepHours}
+                keyboardType="numeric"
+                textBox
+                placeholder="Enter Sleeping hours"
+              />
+              <QuestionSection
+                question="Any Allergies? Please Describe"
+                setSelectedOption={setallergies}
+                option={allergies}
+                textBox
+                placeholder="Describe about your allergies (if they exist)"
+                multiLine={true}
+              />
+            </>
+          )}
+          {/* {questionNumber == 5 && <></>} */}
+        </ScrollView>
       </View>
 
       <View
@@ -167,9 +170,9 @@ const QuestionScreen = ({ navigation }) => {
           textColor={"white"}
           colors={["#4c669f", "#3b5998", "#192f6a"]}
           onClick={async () => {
-            if (questionNumber == 5) {
+            if (questionNumber == 4) {
               await updateDoc(doc(db, "users", appUser?.email), {
-                Weight,
+                weight,
                 height,
                 gender,
                 sleepHours,
@@ -179,7 +182,8 @@ const QuestionScreen = ({ navigation }) => {
                 age,
               }).then(async () => {
                 await getUser().then(() => {
-                  navigation.navigate(screens.Payment);
+                  // navigation.navigate(screens.Payment, { from: "signup" });
+                  navigation.navigate(screens.HomeScreen);
                 });
               });
             }

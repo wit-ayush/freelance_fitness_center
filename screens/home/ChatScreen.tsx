@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import ChatBox from "../../components/ChatBox";
@@ -43,6 +43,7 @@ const ChatScreen = ({ route, navigation }) => {
   const [allMessages, setallMessages] = useState<any>([]);
   const [mediaSelected, setmediaSelected] = useState(null);
   const [mediaBlob, setmediaBlob] = useState(null);
+  const scrollViewRef = useRef(null);
 
   useEffect(() => {
     if (appUser?.isTrainer == false) {
@@ -54,6 +55,12 @@ const ChatScreen = ({ route, navigation }) => {
     //   getAllInChatMessages();
     // }, 5000);
   }, []);
+
+  useEffect(() => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }
+  }, [allMessages]);
 
   const getAllInChatMessages = async () => {
     const messages = [];
@@ -199,7 +206,14 @@ const ChatScreen = ({ route, navigation }) => {
       </View>
 
       <View>
-        <ScrollView keyboardDismissMode="on-drag" style={{ height: "75%" }}>
+        <ScrollView
+          ref={scrollViewRef}
+          keyboardDismissMode="on-drag"
+          style={{ height: "75%" }}
+          onContentSizeChange={() =>
+            scrollViewRef.current.scrollToEnd({ animated: true })
+          }
+        >
           {allMessages &&
             allMessages.map((data, i) => {
               console.log(data);

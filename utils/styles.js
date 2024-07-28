@@ -42,4 +42,10 @@ export const customAppStyles = StyleSheet.create({
     shadowRadius: 30,
     borderColor: "rgba(255, 255, 255, 0.3)",
   },
+  horizontalLine: {
+    height: 1,
+    width: "100%",
+    backgroundColor: "lightgray",
+    marginTop: 20,
+  },
 });

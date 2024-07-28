@@ -20,7 +20,7 @@ const CustomButton = ({
       onPress={onClick}
     >
       <LinearGradient
-        colors={colors}
+        colors={disabled ? ["#B2BEB5", "#B2BEB5"] : colors}
         style={{
           padding: 12,
           marginTop: 20,

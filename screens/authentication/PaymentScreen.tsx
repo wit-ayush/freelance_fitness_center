@@ -17,7 +17,7 @@ import { AppContext } from "../../context/AppContext";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { screens } from "../../utils/constants";
 
-const PaymentScreen = ({ navigation }) => {
+const PaymentScreen = ({ navigation, route }) => {
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [loading, setLoading] = useState(false);
 
@@ -32,7 +32,7 @@ const PaymentScreen = ({ navigation }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ amount }),
+      body: JSON.stringify({ amount: 1099 }),
     });
     const { paymentIntent, ephemeralKey, customer } = await response.json();
 
@@ -77,7 +77,7 @@ const PaymentScreen = ({ navigation }) => {
       Alert.alert("Success", "Your order is confirmed!");
       await updateDoc(doc(db, "users", appUser?.email), {
         subsription: true,
-        subsciptionDate: new Date(),
+        subscription: new Date(),
       }).then(async () => {
         await getUser();
         navigation.navigate(screens.PaymentConfirm);
@@ -96,6 +96,8 @@ const PaymentScreen = ({ navigation }) => {
       features: ["Benefit 1", "Benefit 2", "Benefit 3"],
     },
   ];
+
+  const fromScreen = route?.params?.from;
 
   const [selectedPlan, setselectedPlan] = useState(plans[0]);
   const SelectionComponent = ({ data }) => {
@@ -218,9 +220,13 @@ const PaymentScreen = ({ navigation }) => {
       <View>
         <CustomButton
           onClick={async () => {
-            await initializePaymentSheet().then(async () => {
-              await openPaymentSheet();
-            });
+            try {
+              await initializePaymentSheet().then(async () => {
+                await openPaymentSheet();
+              });
+            } catch (error) {
+              console.log(error);
+            }
           }}
           title={"Make Payment"}
           textColor={"white"}
