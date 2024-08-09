@@ -139,16 +139,16 @@ const Signin = ({ navigation }) => {
           </Text>
         </TouchableOpacity>
         <View style={{ marginTop: 20 }}>
-          <Text style={{ textAlign: "center" }}>Or continue with</Text>
+          {/* <Text style={{ textAlign: "center" }}>Or continue with</Text>
           {/* <SignInWithOAuth /> */}
-          <CustomButton
+          {/* <CustomButton
             onClick={undefined}
             title={"Sign up with Google"}
             textColor={"black"}
             colors={["#fff", "#fff"]}
             iconSource={images.googleSignIn}
-          />
-          {Platform.OS == "ios" && (
+          /> */}
+          {/* {Platform.OS == "ios" && (
             <AppleAuthentication.AppleAuthenticationButton
               buttonType={
                 AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
@@ -182,7 +182,7 @@ const Signin = ({ navigation }) => {
                 }
               }}
             />
-          )}
+          )} */}
         </View>
       </View>
     </SafeAreaView>

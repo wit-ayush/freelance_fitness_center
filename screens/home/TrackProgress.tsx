@@ -34,17 +34,17 @@ const TrackProgress = ({ navigation }) => {
     let filteredData;
     switch (view) {
       case "week":
-        filteredData = data?.filter(
+        filteredData = data.filter(
           (d) => new Date(d.date) > new Date(now.setDate(now.getDate() - 7))
         );
         break;
       case "month":
-        filteredData = data?.filter(
+        filteredData = data.filter(
           (d) => new Date(d.date) > new Date(now.setMonth(now.getMonth() - 1))
         );
         break;
       case "year":
-        filteredData = data?.filter(
+        filteredData = data.filter(
           (d) =>
             new Date(d.date) > new Date(now.setFullYear(now.getFullYear() - 1))
         );
@@ -52,50 +52,53 @@ const TrackProgress = ({ navigation }) => {
       default:
         filteredData = data;
     }
-    return filteredData;
+    // Ensure weights are numbers
+    return filteredData.map((d) => ({
+      ...d,
+      weight: Number(d.weight),
+    }));
   };
 
   const graphData = filterData(userWeights, view);
-  console.log("Filtered Data:", graphData);
+  const dataPoints = graphData.map((d) => d.weight);
+  const labels = graphData.map((d, index) => index + 1); // Example labels for x-axis
 
   useEffect(() => {
     // Optional: fetch user data if not already loaded
-    // getUser();
+    getUser();
   }, []);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
       <WeightInputModal
         modal={weightModal}
         setModal={setWeightModal}
         weightInput={weightInput}
         setWeightInput={setWeightInput}
         userWeights={userWeights}
-        setUserWeights={setUserWeights}
+        setuserWeights={setUserWeights}
       />
-      <View style={{ marginTop: 10 }}>
-        <Image
-          source={images.fcTextLogo}
-          style={{ height: 13, width: 140, alignSelf: "center" }}
+      <View style={styles.header}>
+        {/* <Image source={images.fcTextLogo} style={styles.logo} /> */}
+        <CustomIcon
+          styles={styles.backIcon}
+          name="chevron-back-outline"
+          onClick={() => navigation.goBack()}
+          size={24}
         />
+        <Text style={styles.title}>Your Progress</Text>
       </View>
-      <CustomIcon
-        styles={{ marginLeft: 10, marginTop: 10 }}
-        name="chevron-back-outline"
-        onClick={() => navigation.goBack()}
-        size={24}
-      />
-      <Text style={styles.title}>Your Progress</Text>
       <TouchableOpacity style={styles.weightDisplay}>
         <Text style={styles.weightText}>
           {selectedData
             ? `${selectedData.weight} kg`
-            : userWeights?.length > 0
+            : userWeights.length > 0
             ? `${userWeights[userWeights.length - 1]?.weight} kg`
             : appUser?.weight}
         </Text>
       </TouchableOpacity>
-      <View style={styles.buttonContainer}>
+
+      <View style={{ width: "70%", alignSelf: "center" }}>
         <CustomButton
           onClick={() => setWeightModal(!weightModal)}
           title="Update"
@@ -103,10 +106,11 @@ const TrackProgress = ({ navigation }) => {
         />
       </View>
       <View style={styles.chartContainer}>
-        {graphData?.length > 0 && (
+        {dataPoints.length > 0 && (
           <LineChart
             data={{
-              datasets: [{ data: graphData.map((d) => d.weight) }],
+              labels,
+              datasets: [{ data: dataPoints }],
             }}
             width={screenWidth - 16}
             height={220}
@@ -174,6 +178,22 @@ const TrackProgress = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    marginTop: 10,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  logo: {
+    height: 13,
+    width: 140,
+  },
+  backIcon: {
+    marginLeft: 10,
+    marginTop: 10,
+  },
   title: {
     textAlign: "center",
     marginTop: 10,
@@ -183,7 +203,7 @@ const styles = StyleSheet.create({
   },
   weightDisplay: {
     alignSelf: "center",
-    marginTop: 5,
+    marginTop: 20,
   },
   weightText: {
     fontSize: 20,

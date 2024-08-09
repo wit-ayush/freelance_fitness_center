@@ -15,7 +15,7 @@ import React, { useContext, useEffect, useState } from "react";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { images, screens } from "../../utils/constants";
+import { Trainer_Email, images, screens } from "../../utils/constants";
 import { auth, db } from "../../utils/firebase";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { collection, addDoc, doc, setDoc, getDoc } from "firebase/firestore";
@@ -47,15 +47,19 @@ const Signup = ({ navigation }) => {
         email: email,
         photo: "",
         isTrainer: false,
-        trainer: "",
-      }).then(async () => {
-        const docRef = doc(db, "users", email);
-        const docSnap = await getDoc(docRef);
+        trainer: Trainer_Email,
+      })
+        .then(async () => {
+          const docRef = doc(db, "users", email);
+          const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-          setappUser(docSnap.data());
-        }
-      });
+          if (docSnap.exists()) {
+            setappUser(docSnap.data());
+          }
+        })
+        .catch((e) => {
+          alert(e.message);
+        });
 
       console.log("Document written with ID: ", userDockRef.id);
     } catch (e) {
@@ -128,14 +132,14 @@ const Signup = ({ navigation }) => {
               placeholder={"Create Password"}
               value={password}
               onChangeText={setpassword}
-              secureTextEntry
+              isPassword
             />
             <CustomInput
               label={"Re-enter Password"}
               placeholder={"Re-enter Password"}
               value={confirmPassword}
               onChangeText={setconfirmPassword}
-              secureTextEntry
+              isPassword
             />
             <View style={styles.buttonContainer}>
               <CustomButton
@@ -153,7 +157,7 @@ const Signup = ({ navigation }) => {
                   <Text style={styles.signInLink}> Sign In</Text>
                 </Text>
               </TouchableOpacity>
-              <View style={styles.socialLoginContainer}>
+              {/* <View style={styles.socialLoginContainer}>
                 <Text style={styles.socialLoginText}>Or continue with</Text>
                 <CustomButton
                   onClick={undefined}
@@ -195,7 +199,7 @@ const Signup = ({ navigation }) => {
                     }}
                   />
                 )}
-              </View>
+              </View> */}
             </View>
           </View>
         </ScrollView>
@@ -216,12 +220,11 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     flexGrow: 1,
     justifyContent: "center",
-    padding: 20,
+    // padding: 20,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 20,
   },
   logo: {
     height: 50,

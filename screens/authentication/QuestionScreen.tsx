@@ -40,7 +40,7 @@ const QuestionScreen = ({ navigation }) => {
       </Text>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate(screens.Signup); //  for now later just incremenat the counter
+          navigation.navigate(screens.HomeScreen); //  for now later just incremenat the counter
         }}
       >
         <Text
@@ -170,16 +170,21 @@ const QuestionScreen = ({ navigation }) => {
           textColor={"white"}
           colors={["#4c669f", "#3b5998", "#192f6a"]}
           onClick={async () => {
+            if (questionNumber > 4) {
+              return;
+            }
             if (questionNumber == 4) {
               await updateDoc(doc(db, "users", appUser?.email), {
-                weight,
-                height,
                 gender,
                 sleepHours,
                 trainingHours,
                 trainingGoal,
                 allergies,
                 age,
+                userHealthData: {
+                  height,
+                  weight,
+                },
               }).then(async () => {
                 await getUser().then(() => {
                   // navigation.navigate(screens.Payment, { from: "signup" });

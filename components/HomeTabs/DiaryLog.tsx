@@ -24,8 +24,15 @@ const DiaryLog = ({ navigation }) => {
   const [isModalVisible, setModalVisible] = useState<boolean>(false);
   const [dateTapped, setdateTapped] = useState<Date>(new Date());
 
-  const [userWorkoutLog, setuserWorkoutLog] = useState([]);
-  const [trainerWorkoutLog, settrainerWorkoutLog] = useState([]);
+  const {
+    userWorkoutLog,
+    setuserWorkoutLog,
+    trainerWorkoutLog,
+    settrainerWorkoutLog,
+  } = useContext(AppContext);
+
+  // const [userWorkoutLog, setuserWorkoutLog] = useState([]);
+  // const [trainerWorkoutLog, settrainerWorkoutLog] = useState([]);
 
   const { appUser } = useContext(AppContext);
   const [clickedData, setclickedData] = useState(undefined);
@@ -160,26 +167,6 @@ const DiaryLog = ({ navigation }) => {
             <Text> Sets : {data?.setsPerformed}</Text>
             <Text> Reps : {data?.repsPerformed}</Text>
           </View>
-
-          {/* <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <View style={{ alignItems: "center" }}>
-              <Text>1200 kcal</Text>
-              <Text>Calories burned</Text>
-            </View>
-            <View style={{ alignItems: "center" }}>
-              <Text>90bpm</Text>
-              <Text>Heart Rate</Text>
-            </View>
-            <View style={{ alignItems: "center" }}>
-              <Text>90bpm</Text>
-              <Text>Heart Rate</Text>
-            </View>
-          </View> */}
         </TouchableOpacity>
       </View>
     );

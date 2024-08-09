@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Carousel, { Pagination } from "react-native-snap-carousel";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Progress from "react-native-progress";
@@ -21,6 +21,7 @@ import usePedometer from "../../hooks/usePedometer";
 import UserProfile from "./UserProfile";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../utils/firebase";
+import { AppContext } from "../../context/AppContext";
 
 const UserScreen = ({ navigation }) => {
   const HomeCard = ({
@@ -63,30 +64,30 @@ const UserScreen = ({ navigation }) => {
         }}
       >
         <Text style={{ fontWeight: "bold", marginTop: 10 }}>{text}</Text>
-        <Text style={{ marginTop: 4, fontSize: 20, fontWeight: "bold" }}>
+        <Text style={{ marginTop: 4, fontSize: 18, fontWeight: "bold" }}>
           {data}
         </Text>
       </TouchableOpacity>
     );
   };
+  const { promoSections, setpromoSections } = useContext(AppContext);
 
   // const { steps, distance, flights } = useHealthData();
-  // const { isPedometerAvailable, pastStepCount, currentStepCount } =
-  //   usePedometer();
+  const { isPedometerAvailable, pastStepCount } = usePedometer();
 
-  const [promoSections, setpromoSections] = useState([]);
-  const getHomePromo = async () => {
-    const promos: any = [];
-    const querySnapshot = await getDocs(collection(db, "home"));
-    querySnapshot.forEach((doc) => {
-      promos.push(doc.data());
-      console.log(doc.id, " => ", doc.data());
-    });
-    setpromoSections(promos);
-  };
+  // const [promoSections, setpromoSections] = useState([]);
+  // const getHomePromo = async () => {
+  //   const promos: any = [];
+  //   const querySnapshot = await getDocs(collection(db, "home"));
+  //   querySnapshot.forEach((doc) => {
+  //     promos.push(doc.data());
+  //     console.log(doc.id, " => ", doc.data());
+  //   });
+  //   setpromoSections(promos);
+  // };
 
   useEffect(() => {
-    getHomePromo();
+    // getHomePromo();
   }, []);
 
   const HomeSectionButton = ({ title, onPress }) => {
@@ -195,24 +196,27 @@ const UserScreen = ({ navigation }) => {
         <View
           style={{
             flexDirection: "row",
-            marginLeft: 20,
             marginTop: 10,
+            justifyContent: "space-evenly",
           }}
         >
-          {/* <StatComponent text={"Steps"} data={currentStepCount} /> */}
-          <StatComponent text={"Steps"} data={"Test"} />
+          <StatComponent text={"Steps"} data={pastStepCount} />
+          <StatComponent text={"Sleep Tracker"} data={"Coming Soon"} />
+
+          {/* <StatComponent text={"Steps"} data={"Test"} /> */}
           {/* <StatComponent text={"Avg Calories"} data={"1670"} /> */}
         </View>
-        {/* <View
+
+        <View
           style={{
             flexDirection: "row",
             justifyContent: "space-evenly",
             marginTop: 20,
           }}
         >
-          <StatComponent text={"Heart Rate"} data={"104 BPM"} />
-          <StatComponent text={"Avg Calories"} data={"1670"} />
-        </View> */}
+          <StatComponent text={"Heart Rate"} data={"Coming Soon"} />
+          <StatComponent text={"Avg Calories"} data={"Coming Soon"} />
+        </View>
         <View style={{ height: 50 }} />
       </ScrollView>
     </SafeAreaView>

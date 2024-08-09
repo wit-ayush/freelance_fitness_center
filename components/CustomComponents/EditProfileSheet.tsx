@@ -7,12 +7,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Modal from "react-native-modal";
 import { AppContext } from "../../context/AppContext";
 import * as ImagePicker from "expo-image-picker";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { getBlobFroUri } from "../../utils/constants";
+import { getBlobFroUri, getRandomInt } from "../../utils/constants";
 import { doc, updateDoc } from "firebase/firestore";
 import { app, db, storage } from "../../utils/firebase";
 import CustomIcon from "../CustomIcon";
@@ -24,10 +24,15 @@ const EditProfileSheet = ({ modal, setModal }) => {
 
   const [image, setImage] = useState(appUser?.photo);
   const [userName, setuserName] = useState(appUser?.name);
-  const [userHeight, setuserHeight] = useState(appUser?.userHealthData?.height);
-  const [userWeight, setuserWeight] = useState(appUser?.userHealthData?.weight);
-  const [userAge, setuserAge] = useState(appUser?.age);
+  const [userHeight, setuserHeight] = useState(
+    appUser?.userHealthData?.height?.toString() + " cm"
+  );
+  const [userWeight, setuserWeight] = useState(
+    appUser?.userHealthData?.weight?.toString() + " kg"
+  );
+  const [userAge, setuserAge] = useState(appUser?.age?.toString());
 
+  console.log(appUser);
   const updateUserInfo = async () => {
     const updates = {};
 
@@ -61,29 +66,27 @@ const EditProfileSheet = ({ modal, setModal }) => {
       );
     }
 
-    if (image) {
-      const imageRef = ref(storage, `users/profileImages/${appUser?.name}`);
-      const imageBlob: any = await getBlobFroUri(image);
+    if (image && image !== appUser?.photo) {
+      const imageRef = ref(
+        storage,
+        `users/profileImages/${appUser?.email + getRandomInt().toString()}`
+      );
 
-      console.log("Blob", imageBlob);
+      const imageBlob = await getBlobFroUri(image);
+      if (!imageBlob) {
+        throw new Error("Failed to convert image URI to Blob.");
+      }
 
-      await uploadBytes(imageRef, imageBlob)
-        .then(async (snapshot) => {
-          const downloadURL = await getDownloadURL(imageRef);
-          console.log(downloadURL);
-          await updateDoc(doc(db, "users", appUser?.email), {
-            photo: downloadURL,
-          });
-        })
-        .then(async (result) => {
-          // console.log(result);
-          await getUser();
-          setModal(false);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      await uploadBytes(imageRef, imageBlob);
+      const downloadURL = await getDownloadURL(imageRef);
+
+      await updateDoc(doc(db, "users", appUser?.email), {
+        photo: downloadURL,
+      });
     }
+
+    await getUser();
+    setModal(false);
   };
 
   const pickImage = async () => {
@@ -144,14 +147,7 @@ const EditProfileSheet = ({ modal, setModal }) => {
                   justifyContent: "center",
                   borderRadius: 50,
                 }}
-              >
-                <Image
-                  style={{ height: 70, width: 70, borderRadius: 35 }}
-                  source={{
-                    uri: "https://i.ibb.co/FJ1cyK4/weightlifter.png",
-                  }}
-                />
-              </View>
+              ></View>
             )}
           </TouchableOpacity>
           <TouchableOpacity
@@ -190,12 +186,14 @@ const EditProfileSheet = ({ modal, setModal }) => {
                   placeholder={"Current Height"}
                   value={userHeight ? userHeight : 0}
                   onChangeText={setuserHeight}
+                  styles={{ minWidth: 150 }}
                 />
                 <CustomInput
                   label={"Weight"}
                   placeholder={"Current weight"}
                   value={userWeight ? userWeight : 0}
                   onChangeText={setuserWeight}
+                  styles={{ minWidth: 150 }}
                 />
               </View>
               <View style={{ width: "35%" }}>

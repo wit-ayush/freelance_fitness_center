@@ -51,9 +51,9 @@ const ChatScreen = ({ route, navigation }) => {
       getUserTrainer();
     }
     getAllInChatMessages();
-    // setInterval(() => {
-    //   getAllInChatMessages();
-    // }, 5000);
+    setInterval(() => {
+      getAllInChatMessages();
+    }, 5000);
   }, []);
 
   useEffect(() => {

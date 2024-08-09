@@ -7,10 +7,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export const AppContext = createContext();
 
 const AppProvider = ({ children }) => {
+  const [allPosts, setallPosts] = useState([]);
+
   const [appUser, setappUser] = useState(null);
   const [isTrainer, setisTrainer] = useState("");
   const [trainerData, settrainerData] = useState();
-
+  const [userWorkoutLog, setuserWorkoutLog] = useState([]);
+  const [trainerWorkoutLog, settrainerWorkoutLog] = useState([]);
   const saveCookie = async () => {
     try {
       const jsonValue = JSON.stringify(appUser);
@@ -30,6 +33,9 @@ const AppProvider = ({ children }) => {
       }
     }
   };
+
+  const [promoSections, setpromoSections] = useState();
+  const [settingOptions, setsettingOptions] = useState([]);
 
   const checkTrainer = async () => {
     console.log(appUser.trainer);
@@ -68,6 +74,16 @@ const AppProvider = ({ children }) => {
         trainerData,
         checkTrainer,
         getUser,
+        promoSections,
+        setpromoSections,
+        settingOptions,
+        setsettingOptions,
+        allPosts,
+        setallPosts,
+        userWorkoutLog,
+        setuserWorkoutLog,
+        trainerWorkoutLog,
+        settrainerWorkoutLog,
       }}
     >
       {children}

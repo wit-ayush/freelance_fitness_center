@@ -37,25 +37,19 @@ const WeightInputModal = ({
       const imageURLS = await uploadImages();
       const date = new Date().toISOString().split("T")[0]; // YYYY-MM-DD format
 
+      const newWeightRecord = {
+        weight: weightInput,
+        date,
+        progressImages: imageURLS && imageURLS.length > 0 ? imageURLS : [],
+      };
+
+      // Update the user's weight records array by pushing the new record
       await updateDoc(doc(db, "users", appUser?.email), {
-        userHealthData: {
-          weightRecords: arrayUnion({
-            weight: weightInput,
-            date,
-            progressImages: imageURLS && imageURLS?.length > 0 ? imageURLS : [],
-          }),
-        },
+        "userHealthData.weightRecords": arrayUnion(newWeightRecord),
       });
 
       await getUser();
-      setuserWeights([
-        ...userWeights,
-        {
-          weight: weightInput,
-          date,
-          progressImages: imageURLS,
-        },
-      ]);
+      setuserWeights((prevWeights) => [...prevWeights, newWeightRecord]);
 
       setWeightInput("");
       setimageCollection([]);
@@ -149,7 +143,14 @@ const WeightInputModal = ({
           ))}
         </ScrollView>
 
-        <View style={{ position: "absolute", bottom: 10, width: "100%" }}>
+        <View
+          style={{
+            position: "absolute",
+            bottom: 10,
+            width: "100%",
+            alignSelf: "center",
+          }}
+        >
           {loading && <ActivityIndicator />}
           <CustomButton
             onClick={addWeight}

@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { images } from "../utils/constants";
 import { customAppStyles } from "../utils/styles";
 import CustomPost from "./CustomPost";
@@ -17,13 +17,14 @@ import AddPostModal from "./AddPostModal";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../utils/firebase";
+import { AppContext } from "../context/AppContext";
 
 const Post = ({ navigation }) => {
   const [postData, setpostData] = useState([]);
   const [showAddPostModal, setshowAddPostModal] = useState(false);
   const [postLoading, setpostLoading] = useState(false);
-
-  const [allPosts, setallPosts] = useState([]);
+  const { allPosts, setallPosts } = useContext(AppContext);
+  // const [allPosts, setallPosts] = useState([]);
 
   const getAllPosts = async () => {
     setpostLoading(true);
@@ -37,15 +38,15 @@ const Post = ({ navigation }) => {
     setpostLoading(false);
   };
 
-  useEffect(() => {
-    getAllPosts();
-  }, []);
+  // useEffect(() => {
+  //   getAllPosts();
+  // }, []);
   const [refreshing, setRefreshing] = React.useState(false);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(async () => {
-      await getAllPosts();
+      // await getAllPosts();
       setRefreshing(false);
     }, 2000);
   }, []);

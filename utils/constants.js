@@ -128,6 +128,11 @@ export const getBlobFroUri = async (uri) => {
 
   return blob;
 };
+// export const getBlobFroUri = async (uri) => {
+//   const response = await fetch(uri);
+//   const blob = await response.blob();
+//   return blob;
+// };
 
 export const DATA = [
   {

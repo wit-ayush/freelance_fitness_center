@@ -29,46 +29,11 @@ const UserProfile = ({ navigation, showUserProfile, setShowUserProfile }) => {
   useEffect(() => {
     if (appUser == null) {
       navigation.navigate(screens.AuthScreen);
+    } else {
+      getUser();
     }
   }, [appUser, setappUser]);
   const [image, setImage] = useState(appUser?.photo);
-
-  const pickImage = async () => {
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-
-      if (!result.canceled) {
-        setImage(result.assets[0].uri);
-      }
-      const imageRef = ref(storage, `users/profileImages/${appUser?.name}`);
-      const imageBlob: any = await getBlobFroUri(result.assets[0].uri);
-
-      console.log("Blob", imageBlob);
-
-      await uploadBytes(imageRef, imageBlob)
-        .then(async (snapshot) => {
-          const downloadURL = await getDownloadURL(imageRef);
-          console.log(downloadURL);
-          await updateDoc(doc(db, "users", appUser?.email), {
-            photo: downloadURL,
-          });
-        })
-        .then(async (result) => {
-          // console.log(result);
-          await getUser();
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    } catch (error) {
-      console.log("From Photo Change", error);
-    }
-  };
 
   const OptionsBox = ({ onClick, title, iconName }) => {
     return (
@@ -182,21 +147,7 @@ const UserProfile = ({ navigation, showUserProfile, setShowUserProfile }) => {
               source={{ uri: image }}
             />
           ) : (
-            <View
-              style={{
-                alignItems: "center",
-                borderWidth: 2,
-                height: 100,
-                width: 100,
-                justifyContent: "center",
-                borderRadius: 50,
-              }}
-            >
-              <Image
-                style={{ height: 70, width: 70, borderRadius: 35 }}
-                source={{ uri: "https://i.ibb.co/FJ1cyK4/weightlifter.png" }}
-              />
-            </View>
+            <View></View>
           )}
         </TouchableOpacity>
         <Text

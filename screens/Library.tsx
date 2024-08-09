@@ -8,15 +8,18 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import LibraryModal from "../components/LibraryModal";
 import { exercises, images, libraryOptions, screens } from "../utils/constants";
 import SearchExercise from "../components/SearchExercise";
 import { collection, doc, getDocs } from "firebase/firestore";
 import { db } from "../utils/firebase";
+import { AppContext } from "../context/AppContext";
 
 const Library = ({ navigation }) => {
   const [refreshing, setRefreshing] = React.useState(false);
+
+  const { settingOptions, setsettingOptions } = useContext(AppContext);
 
   const [libraryModal, setlibraryModal] = useState(false);
   const [exerciseDataModal, setexerciseDataModal] = useState(null);
@@ -26,7 +29,7 @@ const Library = ({ navigation }) => {
     }
   }, [exerciseDataModal]);
 
-  const [settingOptions, setsettingOptions] = useState([]);
+  // const [settingOptions, setsettingOptions] = useState([]);
 
   const getSettings = async () => {
     const settings: any = [];
@@ -39,7 +42,7 @@ const Library = ({ navigation }) => {
   };
 
   useEffect(() => {
-    getSettings();
+    // getSettings();
   }, []);
 
   const onRefresh = React.useCallback(() => {

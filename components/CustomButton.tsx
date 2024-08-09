@@ -13,44 +13,48 @@ const CustomButton = ({
   return (
     <TouchableOpacity
       disabled={disabled}
-      style={{
-        alignSelf: "center",
-        width: "100%",
-      }}
+      style={styles.buttonContainer}
       onPress={onClick}
     >
       <LinearGradient
         colors={disabled ? ["#B2BEB5", "#B2BEB5"] : colors}
-        style={{
-          padding: 12,
-          marginTop: 20,
-          justifyContent: "center",
-          width: "90%",
-          borderRadius: 10,
-          alignSelf: "center",
-          borderColor: "grey",
-          borderWidth: 1,
-          flexDirection: "row",
-        }}
+        style={styles.button}
       >
-        {iconSource && (
-          <Image style={{ marginRight: 20 }} source={iconSource} />
-        )}
-        <Text
-          style={{
-            color: textColor,
-            fontSize: 18,
-            textAlign: "center",
-            fontWeight: "600",
-          }}
-        >
-          {title}
-        </Text>
+        {iconSource && <Image style={styles.icon} source={iconSource} />}
+        <Text style={[styles.text, { color: textColor }]}>{title}</Text>
       </LinearGradient>
     </TouchableOpacity>
   );
 };
 
-export default CustomButton;
+const styles = StyleSheet.create({
+  buttonContainer: {
+    alignSelf: "center",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  button: {
+    padding: 12,
+    marginTop: 20,
+    justifyContent: "center",
+    width: "90%",
+    borderRadius: 10,
+    alignSelf: "center",
+    borderColor: "grey",
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  icon: {
+    marginRight: 20,
+  },
+  text: {
+    fontSize: 18,
+    textAlign: "center",
+    fontWeight: "600",
+    alignSelf: "center",
+  },
+});
 
-const styles = StyleSheet.create({});
+export default CustomButton;

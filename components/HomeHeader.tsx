@@ -23,20 +23,26 @@ const HomeHeader = ({ navigation, onImagePress }) => {
         alignItems: "center",
       }}
     >
-      <TouchableOpacity onPress={onImagePress}>
-        {appUser && appUser?.photo && (
-          <Image
-            source={{ uri: appUser?.photo }}
-            style={{
-              height: 50,
-              width: 50,
-              borderRadius: 25,
-              borderWidth: 2,
-              borderColor: "lightgray",
-            }}
-          />
-        )}
-      </TouchableOpacity>
+      {appUser && appUser?.photo ? (
+        <TouchableOpacity onPress={onImagePress}>
+          {appUser && appUser?.photo && (
+            <Image
+              source={{ uri: appUser?.photo }}
+              style={{
+                height: 50,
+                width: 50,
+                borderRadius: 25,
+                borderWidth: 2,
+                borderColor: "lightgray",
+              }}
+            />
+          )}
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity onPress={onImagePress}>
+          <Ionicons name="person-circle-outline" size={30} />
+        </TouchableOpacity>
+      )}
       {/* <Text style={{ fontWeight: "bold", fontSize: 17 }}>{appUser?.email}</Text> */}
       <View style={{}}>
         <Image

@@ -3,11 +3,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Modal from "react-native-modal";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Dropdown } from "react-native-element-dropdown";
@@ -19,8 +18,6 @@ import CustomButton from "../CustomButton";
 import { customAppStyles } from "../../utils/styles";
 import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 import { AppContext } from "../../context/AppContext";
-import { duration } from "moment";
-import { getDatabase, ref, child, push, update } from "firebase/database";
 import { db } from "../../utils/firebase";
 
 const DiaryEntryModal = ({
@@ -30,31 +27,44 @@ const DiaryEntryModal = ({
   clickedData,
   setClickedData,
 }) => {
-  console.log(clickedData);
-  const [workoutSelected, setworkoutSelected] = useState(
-    clickedData?.selectedWorkout
-  );
+  const [workoutSelected, setworkoutSelected] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
-  const [workoutDuration, setworkoutDuration] = useState(
-    clickedData?.durationOfWorkout
-  );
+  const [workoutDuration, setworkoutDuration] = useState(0);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [dateSelected, setdateSelected] = useState<Date>(
-    new Date(clickedData?.dateSelect)
-  );
+  const [dateSelected, setdateSelected] = useState<Date>(new Date());
   const [showDateModal, setshowDateModal] = useState(false);
-  const [setsPerformed, setsetsPerformed] = useState(
-    clickedData ? clickedData.setsPerformed : 0
-  );
-  const [repsPerformed, setrepsPerformed] = useState(
-    clickedData?.repsPerformed
-  );
+  const [setsPerformed, setsetsPerformed] = useState(0);
+  const [repsPerformed, setrepsPerformed] = useState(0);
   const [showstartTimeModal, setShowStartTimeModal] = useState(false);
   const [showEndTimeModal, setshowEndTimeModal] = useState(false);
-  const [startTime, setstartTime] = useState<any>(clickedData?.startTime);
-  const [endTime, setendTime] = useState<any>(clickedData?.endTime);
+  const [startTime, setstartTime] = useState<any>(null);
+  const [endTime, setendTime] = useState<any>(null);
 
   const { appUser } = useContext(AppContext);
+
+  useEffect(() => {
+    if (clickedData) {
+      setworkoutSelected(clickedData.selectedWorkout);
+      setworkoutDuration(clickedData.durationOfWorkout);
+      setdateSelected(new Date(clickedData.dateSelect));
+      setsetsPerformed(clickedData.setsPerformed);
+      setrepsPerformed(clickedData.repsPerformed);
+      setstartTime(clickedData.startTime);
+      setendTime(clickedData.endTime);
+    } else {
+      resetFields();
+    }
+  }, [clickedData]);
+
+  const resetFields = () => {
+    setworkoutSelected(null);
+    setworkoutDuration(0);
+    setdateSelected(new Date());
+    setsetsPerformed(0);
+    setrepsPerformed(0);
+    setstartTime(null);
+    setendTime(null);
+  };
 
   const saveWorkoutLog = async () => {
     if (clickedData) {
@@ -65,7 +75,7 @@ const DiaryEntryModal = ({
           durationOfWorkout: workoutDuration,
           setsPerformed: setsPerformed,
           repsPerformed: repsPerformed,
-          dateSelect: dateSelected,
+          dateSelect: dateSelected.toDateString(),
           calorieBurnt: 90,
           startTime: startTime,
           endTime: endTime,
@@ -75,8 +85,6 @@ const DiaryEntryModal = ({
         setClickedData(null);
         setIsModal(false);
       });
-
-      return;
     } else {
       await addDoc(collection(db, `workoutlogs/${appUser?.email}/logs`), {
         selectedWorkout: workoutSelected,
@@ -90,7 +98,6 @@ const DiaryEntryModal = ({
       })
         .then(async () => {
           await getAllWorkoutLogs();
-
           setIsModal(false);
         })
         .catch((e) => console.log(e));
@@ -143,27 +150,11 @@ const DiaryEntryModal = ({
               {clickedData ? "Edit Workout" : "Add a new workout log"}
             </Text>
           </View>
-          <Text style={{ marginTop: 20 }}>Select Workout</Text>
-          <Dropdown
-            style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
-            data={logWorkouts}
-            search
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            placeholder={!isFocus ? "Select item" : logWorkouts[0].label}
-            searchPlaceholder="Search..."
+          <CustomInput
+            label={"Enter Workout"}
+            placeholder={"Enter here"}
             value={workoutSelected}
-            onFocus={() => setIsFocus(true)}
-            onBlur={() => setIsFocus(false)}
-            onChange={(item) => {
-              setworkoutSelected(item.value);
-              setIsFocus(false);
-            }}
+            onChangeText={setworkoutSelected}
           />
           <Text
             style={{
@@ -324,7 +315,6 @@ const DiaryEntryModal = ({
                   !dateSelected
                 ) {
                   Alert.alert("Complete the fields to save");
-
                   return;
                 } else {
                   await saveWorkoutLog();

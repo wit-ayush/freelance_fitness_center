@@ -1,5 +1,12 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
-import React from "react";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  TouchableOpacity,
+} from "react-native";
+import React, { useState } from "react";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const CustomInput = ({
   autofocus = false,
@@ -10,10 +17,14 @@ const CustomInput = ({
   multiLine = false,
   type = "default",
   editable = true,
+  isPassword = false,
   mt = 30,
+  styles = {},
 }) => {
+  const [showPass, setShowPass] = useState(false);
+
   return (
-    <View style={{ marginTop: mt }}>
+    <View style={[styles, { marginTop: mt }]}>
       <Text style={{ marginLeft: 12, marginBottom: 10, fontSize: 15 }}>
         {label}
       </Text>
@@ -26,6 +37,8 @@ const CustomInput = ({
           height: multiLine ? 100 : 50,
           justifyContent: "center",
           marginHorizontal: 10,
+          flexDirection: "row",
+          alignItems: "center",
         }}
       >
         <TextInput
@@ -38,7 +51,16 @@ const CustomInput = ({
           keyboardType={type}
           autoFocus={autofocus}
           editable={editable}
+          secureTextEntry={isPassword && !showPass}
         />
+        {isPassword && (
+          <TouchableOpacity onPress={() => setShowPass(!showPass)}>
+            <Ionicons
+              name={showPass ? "eye-off-outline" : "eye-outline"}
+              size={20}
+            />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -47,7 +69,3 @@ const CustomInput = ({
 export default CustomInput;
 
 const styles = StyleSheet.create({});
-
-// linear-gradient(to top, rgb(254, 202, 202), rgb(252, 165, 165), rgb(254, 240, 138))
-
-// bg-gradient-to-t from-red-200 via-red-300 to-yellow-200

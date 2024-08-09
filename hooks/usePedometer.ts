@@ -11,15 +11,24 @@ const usePedometer = () => {
   const { appUser } = useContext(AppContext);
 
   useEffect(() => {
-    let subscription;
+    let subscription = null;
 
     const fetchStepCountFromFirebase = async () => {
-      const docRef = doc(db, "users", appUser?.email);
+      if (!appUser?.email) return;
+
+      const docRef = doc(db, "users", appUser.email);
       const docSnap = await getDoc(docRef);
+
       if (docSnap.exists()) {
         const data = docSnap.data();
         setPastStepCount(data.pastStepCount || 0);
         setCurrentStepCount(data.currentStepCount || 0);
+      } else {
+        // Initialize if no data exists
+        await setDoc(docRef, {
+          pastStepCount: 0,
+          currentStepCount: 0,
+        });
       }
     };
 
@@ -38,35 +47,34 @@ const usePedometer = () => {
           start,
           end
         );
-        if (pastStepCountResult) {
-          const newPastStepCount = pastStepCountResult.steps;
-          const totalStepCount = newPastStepCount + currentStepCount;
+        const newPastStepCount = pastStepCountResult.steps || 0;
+        const totalStepCount = newPastStepCount + currentStepCount;
 
-          setPastStepCount(newPastStepCount);
-          setCurrentStepCount(totalStepCount);
+        setPastStepCount(newPastStepCount);
+        setCurrentStepCount(totalStepCount);
 
-          await setDoc(
-            doc(db, "users", appUser?.email),
-            {
-              pastStepCount: newPastStepCount,
-              currentStepCount: totalStepCount,
-            },
-            { merge: true }
-          );
-        }
+        await setDoc(
+          doc(db, "users", appUser.email),
+          {
+            pastStepCount: newPastStepCount,
+            currentStepCount: totalStepCount,
+          },
+          { merge: true }
+        );
 
-        subscription = Pedometer.watchStepCount(async (result) => {
-          const newCurrentStepCount = result.steps + pastStepCount;
-          setCurrentStepCount(newCurrentStepCount);
-
-          await setDoc(
-            doc(db, "users", appUser?.email),
-            {
-              pastStepCount,
-              currentStepCount: newCurrentStepCount,
-            },
-            { merge: true }
-          );
+        subscription = Pedometer.watchStepCount((result) => {
+          setCurrentStepCount((prevCount) => {
+            const newCount = prevCount + result.steps;
+            setDoc(
+              doc(db, "users", appUser.email),
+              {
+                pastStepCount: pastStepCount,
+                currentStepCount: newCount,
+              },
+              { merge: true }
+            );
+            return newCount;
+          });
         });
       }
     };
@@ -78,7 +86,7 @@ const usePedometer = () => {
         subscription.remove();
       }
     };
-  }, [appUser?.email]);
+  }, [appUser?.email, currentStepCount, pastStepCount]);
 
   return {
     isPedometerAvailable,

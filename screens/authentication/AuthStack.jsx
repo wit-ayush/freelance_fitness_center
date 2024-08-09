@@ -10,6 +10,7 @@ import Signin from "./Signin";
 import HomeStack from "../home/HomeStack";
 import PaymentScreen from "./PaymentScreen";
 import PaymentConfirmation from "./PaymentConfirmation";
+import HomeScreen from "../home/HomeScreen";
 
 const AuthStack = () => {
   const Stack = createNativeStackNavigator();
@@ -43,6 +44,11 @@ const AuthStack = () => {
       <Stack.Screen
         name={screens.Payment}
         component={PaymentScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name={screens.HomeScreen}
+        component={HomeScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
