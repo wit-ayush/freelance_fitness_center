@@ -1,21 +1,27 @@
 {
   "expo": {
-    "name": "client",
+    "name": "Fit Center",
     "slug": "client",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "extra": {
+      "clerkPublishableKey": "pk_test_bmV4dC1lZnQtNjQuY2xlcmsuYWNjb3VudHMuZGV2JA",
+      "eas": {
+        "projectId": "52769603-3736-406b-b6f8-24b5bacbd44b"
+      }
+    },
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "usesAppleSignIn": false,
+      "bundleIdentifier": "com.khushcodezz.client"
     },
     "android": {
       "adaptiveIcon": {
@@ -25,6 +31,30 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-apple-authentication",
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ],
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "",
+          "enableGooglePay": true
+        }
+      ],
+      "expo-secure-store",
+      "react-native-health"
+    ],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/52769603-3736-406b-b6f8-24b5bacbd44b"
     }
   }
 }

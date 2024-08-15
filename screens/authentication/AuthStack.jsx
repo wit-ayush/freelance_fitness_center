@@ -5,6 +5,12 @@ import AuthScreen from "./AuthScreen";
 import SplashScreen from "./SplashScreen";
 import { screens } from "../../utils/constants";
 import QuestionScreen from "./QuestionScreen";
+import Signup from "./Signup";
+import Signin from "./Signin";
+import HomeStack from "../home/HomeStack";
+import PaymentScreen from "./PaymentScreen";
+import PaymentConfirmation from "./PaymentConfirmation";
+import HomeScreen from "../home/HomeScreen";
 
 const AuthStack = () => {
   const Stack = createNativeStackNavigator();
@@ -23,6 +29,31 @@ const AuthStack = () => {
       <Stack.Screen
         name={screens.Question}
         component={QuestionScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name={screens.Signup}
+        component={Signup}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name={screens.Signin}
+        component={Signin}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name={screens.Payment}
+        component={PaymentScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name={screens.HomeScreen}
+        component={HomeScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name={screens.PaymentConfirm}
+        component={PaymentConfirmation}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
