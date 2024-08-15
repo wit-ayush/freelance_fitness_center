@@ -18,7 +18,7 @@ import Carousel from "react-native-snap-carousel";
 import HomeHeader from "../../components/HomeHeader";
 import UserScreen from "../../components/HomeTabs/UserScreen";
 import CustomBottomNav from "../../components/CustomBottomNav";
-import DiaryScreen from "./DiaryScreen";
+
 import DiaryLog from "../../components/HomeTabs/DiaryLog";
 import PlanScreen from "../../components/HomeTabs/PlanScreen";
 import UserProfile from "../../components/HomeTabs/UserProfile";

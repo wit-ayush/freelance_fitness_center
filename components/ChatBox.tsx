@@ -49,7 +49,7 @@ const ChatBox = ({ data, navigation, sender, reciever }) => {
           />
         </View>
         <View style={{ marginLeft: 10 }}>
-          <Text style={{ fontWeight: "bold" }}>{data?.email}</Text>
+          <Text style={{ fontWeight: "bold" }}>{data?.name}</Text>
           <Text style={{ fontWeight: "300", color: "gray" }}>
             {"Lorem ipsum et sea ea nonumy takimat."}
           </Text>

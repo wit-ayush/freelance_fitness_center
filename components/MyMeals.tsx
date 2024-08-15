@@ -6,9 +6,18 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { AppContext } from "../context/AppContext";
 
 const MyMeals = () => {
+  const { appUser } = useContext(AppContext);
+  const [proteinContent, setproteinContent] = useState<any>(
+    appUser?.macros?.protein
+  );
+  const [carbsContent, setcarbsContent] = useState<any>(appUser?.macros?.carbs);
+  const [fatsContent, setfatsContent] = useState<any>(appUser?.macros?.fats);
+
   const MacrosBox = ({ text, data }) => {
     return (
       <View style={{ alignItems: "center" }}>
@@ -87,12 +96,12 @@ const MyMeals = () => {
               width: "100%",
             }}
           >
-            <MacrosBox text={"Protein"} data={100} />
+            <MacrosBox text={"Protein"} data={proteinContent} />
             <View style={styles.verticalLine} />
-            <MacrosBox text={"Carbs"} data={100} />
+            <MacrosBox text={"Carbs"} data={carbsContent} />
             <View style={styles.verticalLine} />
 
-            <MacrosBox text={"Fats"} data={100} />
+            <MacrosBox text={"Fats"} data={fatsContent} />
           </View>
         </View>
         <FoodBox mealType={"Breakfast"} />

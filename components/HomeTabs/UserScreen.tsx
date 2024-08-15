@@ -1,7 +1,9 @@
 import {
+  Alert,
   Dimensions,
   Image,
   ImageBackground,
+  Linking,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -22,8 +24,11 @@ import UserProfile from "./UserProfile";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../utils/firebase";
 import { AppContext } from "../../context/AppContext";
+import * as MailComposer from "expo-mail-composer";
 
 const UserScreen = ({ navigation }) => {
+  const [status, setStatus] = useState(null);
+
   const HomeCard = ({
     cardTitle,
     imageURL,
@@ -72,6 +77,21 @@ const UserScreen = ({ navigation }) => {
   };
   const { promoSections, setpromoSections } = useContext(AppContext);
 
+  const handleEmailPress = () => {
+    const email = "example@example.com";
+    const subject = "Hello from my app!";
+    const body = "This is the body of the email.";
+
+    // Construct the mailto URL
+    const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+
+    // Open the email client
+    Linking.openURL(mailtoUrl).catch((err) =>
+      console.error("Error opening email client:", err)
+    );
+  };
   // const { steps, distance, flights } = useHealthData();
   const { isPedometerAvailable, pastStepCount } = usePedometer();
 
@@ -93,7 +113,9 @@ const UserScreen = ({ navigation }) => {
   const HomeSectionButton = ({ title, onPress }) => {
     return (
       <TouchableOpacity
-        onPress={onPress}
+        onPress={async () => {
+          await onPress();
+        }}
         style={{
           backgroundColor: "#E5E4E2",
           width: "90%",
@@ -179,7 +201,7 @@ const UserScreen = ({ navigation }) => {
           />
           <HomeSectionButton
             title={"Schedule a call with an Expert"}
-            onPress={undefined}
+            onPress={handleEmailPress}
           />
         </View>
 
