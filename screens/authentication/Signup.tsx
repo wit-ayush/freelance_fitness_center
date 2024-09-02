@@ -5,30 +5,40 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
   Platform,
   Alert,
 } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { Trainer_Email, images, screens } from "../../utils/constants";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../utils/firebase";
-import * as AppleAuthentication from "expo-apple-authentication";
-import { collection, addDoc, doc, setDoc, getDoc } from "firebase/firestore";
+import { collection, doc, setDoc, getDoc } from "firebase/firestore";
 import { AppContext } from "../../context/AppContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSignUp } from "@clerk/clerk-expo";
+import { Trainer_Email, screens } from "../../utils/constants";
 
 const Signup = ({ navigation }) => {
-  const [name, setname] = useState("");
-  const [email, setemail] = useState("");
-  const [password, setpassword] = useState("");
-  const [confirmPassword, setconfirmPassword] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const { isLoaded, signUp, setActive } = useSignUp();
+  const { appUser, setAppUser } = useContext(AppContext);
+  const [pendingVerification, setPendingVerification] = useState(false);
+  const [code, setCode] = useState("");
 
-  const { appUser, setappUser } = useContext(AppContext);
+  const getUser = async (email) => {
+    const docRef = doc(db, "users", email);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      await setAppUser(docSnap.data());
+    }
+  };
 
   const saveCookie = async () => {
     try {
@@ -40,9 +50,9 @@ const Signup = ({ navigation }) => {
   };
 
   const addUserToDatabase = async () => {
-    const userDockRef = doc(db, "users", email);
+    const userDocRef = doc(db, "users", email);
     try {
-      await setDoc(userDockRef, {
+      await setDoc(userDocRef, {
         name: name,
         email: email,
         photo: "",
@@ -54,25 +64,19 @@ const Signup = ({ navigation }) => {
           const docSnap = await getDoc(docRef);
 
           if (docSnap.exists()) {
-            setappUser(docSnap.data());
+            setAppUser(docSnap.data());
+            navigation.navigate(screens.Question, { userEmail: email });
           }
         })
         .catch((e) => {
           alert(e.message);
         });
 
-      console.log("Document written with ID: ", userDockRef.id);
+      console.log("Document written with ID: ", userDocRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
   };
-
-  useEffect(() => {
-    if (appUser != null) {
-      saveCookie();
-      navigation.navigate(screens.Question);
-    }
-  }, [appUser]);
 
   const handleSignup = async () => {
     if (confirmPassword !== password) {
@@ -83,7 +87,7 @@ const Signup = ({ navigation }) => {
       console.log(name, email, password);
       await createUserWithEmailAndPassword(auth, email, password)
         .then(async (userCredential) => {
-          console.log("account created");
+          console.log("Account created");
           const user = userCredential.user;
           console.log(user);
           if (user) {
@@ -91,14 +95,142 @@ const Signup = ({ navigation }) => {
           }
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
           alert(error.message);
         });
     } else {
       Alert.alert("Invalid Credentials", "Complete all fields to continue");
     }
   };
+
+  const onSignUpPress = async () => {
+    if (confirmPassword !== password) {
+      Alert.alert("Passwords do not match", "");
+      return;
+    }
+
+    if (!name || !email || !password || !confirmPassword) {
+      Alert.alert("Fields incomplete", "Complete all fields to continue");
+      return;
+    }
+
+    try {
+      await signUp.create({
+        emailAddress: email,
+        password,
+        username: name,
+      });
+
+      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+
+      setPendingVerification(true);
+    } catch (err: any) {
+      if (err.errors[0].message) {
+        Alert.alert(err.errors[0].message);
+      }
+      console.error(JSON.stringify(err, null, 2));
+    }
+  };
+
+  const onPressVerify = async () => {
+    if (!isLoaded) {
+      return;
+    }
+
+    if (!code) {
+      return;
+    }
+
+    try {
+      const completeSignUp = await signUp.attemptEmailAddressVerification({
+        code,
+      });
+
+      if (completeSignUp.status === "complete") {
+        await setActive({ session: completeSignUp.createdSessionId });
+        await addUserToDatabase();
+      } else {
+        console.error(JSON.stringify(completeSignUp, null, 2));
+      }
+    } catch (err: any) {
+      Alert.alert("Error Occurred");
+      console.error(JSON.stringify(err, null, 2));
+    }
+  };
+
+  const EmailForm = () => (
+    <View style={styles.form}>
+      <CustomInput
+        label={"Email"}
+        placeholder={"Enter Email"}
+        value={email}
+        onChangeText={setEmail}
+      />
+      <CustomInput
+        label={"Full Name"}
+        placeholder={"Enter Full Name"}
+        value={name}
+        onChangeText={setName}
+      />
+      <CustomInput
+        label={"Password"}
+        placeholder={"Create Password"}
+        value={password}
+        onChangeText={setPassword}
+        isPassword
+      />
+      <CustomInput
+        label={"Re-enter Password"}
+        placeholder={"Re-enter Password"}
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        isPassword
+      />
+      <View style={styles.buttonContainer}>
+        <CustomButton
+          onClick={onSignUpPress}
+          title={"Create an Account"}
+          textColor={"white"}
+        />
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate(screens.Signin);
+          }}
+        >
+          <Text style={styles.signInText}>
+            Already a Member?
+            <Text style={styles.signInLink}> Sign In</Text>
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  const VerifyCode = () => (
+    <View style={{ marginTop: 40, width: "90%", alignSelf: "center" }}>
+      <Text
+        style={{
+          alignSelf: "center",
+          fontSize: 16,
+          textAlign: "center",
+          fontWeight: "bold",
+        }}
+      >
+        Verify Code sent to {email}
+      </Text>
+      <CustomInput
+        value={code}
+        onChangeText={setCode}
+        isPassword
+        label={undefined}
+        placeholder={undefined}
+      />
+      <CustomButton
+        onClick={onPressVerify}
+        title={"Confirm Code"}
+        textColor={"white"}
+      />
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.safeAreaView}>
@@ -114,94 +246,7 @@ const Signup = ({ navigation }) => {
             />
             <Text style={styles.title}>Create your Account</Text>
           </View>
-          <View style={styles.form}>
-            <CustomInput
-              label={"Email"}
-              placeholder={"Enter Email"}
-              value={email}
-              onChangeText={setemail}
-            />
-            <CustomInput
-              label={"Full Name"}
-              placeholder={"Enter Full Name"}
-              value={name}
-              onChangeText={setname}
-            />
-            <CustomInput
-              label={"Password"}
-              placeholder={"Create Password"}
-              value={password}
-              onChangeText={setpassword}
-              isPassword
-            />
-            <CustomInput
-              label={"Re-enter Password"}
-              placeholder={"Re-enter Password"}
-              value={confirmPassword}
-              onChangeText={setconfirmPassword}
-              isPassword
-            />
-            <View style={styles.buttonContainer}>
-              <CustomButton
-                onClick={handleSignup}
-                title={"Create an Account"}
-                textColor={"white"}
-              />
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate(screens.Signin);
-                }}
-              >
-                <Text style={styles.signInText}>
-                  Already a Member?
-                  <Text style={styles.signInLink}> Sign In</Text>
-                </Text>
-              </TouchableOpacity>
-              {/* <View style={styles.socialLoginContainer}>
-                <Text style={styles.socialLoginText}>Or continue with</Text>
-                <CustomButton
-                  onClick={undefined}
-                  title={"Sign up with Google"}
-                  textColor={"black"}
-                  colors={["#fff", "#fff"]}
-                  iconSource={images.googleSignIn}
-                />
-                {Platform.OS === "ios" && (
-                  <AppleAuthentication.AppleAuthenticationButton
-                    buttonType={
-                      AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
-                    }
-                    buttonStyle={
-                      AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
-                    }
-                    style={styles.appleButton}
-                    cornerRadius={10}
-                    onPress={async () => {
-                      try {
-                        const credential =
-                          await AppleAuthentication.signInAsync({
-                            requestedScopes: [
-                              AppleAuthentication.AppleAuthenticationScope
-                                .FULL_NAME,
-                              AppleAuthentication.AppleAuthenticationScope
-                                .EMAIL,
-                            ],
-                          }).then((result) => {
-                            console.log(result.fullName);
-                          });
-                      } catch (e) {
-                        if (e.code === "ERR_REQUEST_CANCELED") {
-                          console.log(e);
-                        } else {
-                          console.log(e);
-                        }
-                      }
-                    }}
-                  />
-                )}
-              </View> */}
-            </View>
-          </View>
+          {pendingVerification ? <VerifyCode /> : <EmailForm />}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -219,12 +264,11 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     flexGrow: 1,
-    justifyContent: "center",
-    // padding: 20,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
+    marginTop: 10,
   },
   logo: {
     height: 50,
@@ -249,18 +293,5 @@ const styles = StyleSheet.create({
   },
   signInLink: {
     textDecorationLine: "underline",
-  },
-  socialLoginContainer: {
-    marginTop: 20,
-    alignItems: "center",
-  },
-  socialLoginText: {
-    textAlign: "center",
-  },
-  appleButton: {
-    width: "90%",
-    height: 50,
-    alignSelf: "center",
-    marginTop: 10,
   },
 });

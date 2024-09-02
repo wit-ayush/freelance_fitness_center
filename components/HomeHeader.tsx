@@ -4,10 +4,12 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { images, screens } from "../utils/constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AppContext } from "../context/AppContext";
+import { useUser } from "@clerk/clerk-expo";
 
 const HomeHeader = ({ navigation, onImagePress }) => {
   const { appUser } = useContext(AppContext);
 
+  const { user } = useUser();
   const signOut = async () => {
     await AsyncStorage.removeItem("user");
     await AsyncStorage.removeItem("user").then(() => {
@@ -25,9 +27,9 @@ const HomeHeader = ({ navigation, onImagePress }) => {
     >
       {appUser && appUser?.photo ? (
         <TouchableOpacity onPress={onImagePress}>
-          {appUser && appUser?.photo && (
+          {user && user?.hasImage && (
             <Image
-              source={{ uri: appUser?.photo }}
+              source={{ uri: user?.imageUrl }}
               style={{
                 height: 50,
                 width: 50,
@@ -60,7 +62,10 @@ const HomeHeader = ({ navigation, onImagePress }) => {
           <Ionicons color={"black"} size={27} name="chatbox-ellipses-outline" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={{}}>
+        <TouchableOpacity
+          // onPress={() => navigation.navigate(screens.Question)}
+          style={{}}
+        >
           <Ionicons size={27} name="notifications-outline" />
         </TouchableOpacity>
       </View>

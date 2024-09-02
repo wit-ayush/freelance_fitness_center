@@ -19,6 +19,7 @@ import { screens } from "../../utils/constants";
 
 const PaymentScreen = ({ navigation, route }) => {
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
+
   const [loading, setLoading] = useState(false);
 
   const { appUser, getUser } = useContext(AppContext);

@@ -1,4 +1,6 @@
 import {
+  ActivityIndicator,
+  Alert,
   Image,
   KeyboardAvoidingView,
   SafeAreaView,
@@ -16,12 +18,15 @@ import QuestionSection from "../../components/QuestionSection";
 import { AppContext } from "../../context/AppContext";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../utils/firebase";
+import { useSessionList } from "@clerk/clerk-expo";
 
-const QuestionScreen = ({ navigation }) => {
+const QuestionScreen = ({ navigation , route}) => {
   const [questionNumber, setquestionNumber] = useState(0);
-  const [progressBarController, setprogressBarController] = useState(0.1);
+  const [progressBarController, setprogressBarController] = useState(0.0);
+const userEmail = route?.params?.userEmail
 
-  const { appUser, getUser } = useContext(AppContext);
+console.log(userEmail)
+const [loading, setloading] = useState(false)
 
   const [gender, setgender] = useState("");
   const [age, setage] = useState();
@@ -47,7 +52,7 @@ const QuestionScreen = ({ navigation }) => {
           style={{
             textAlign: "right",
             fontSize: 13,
-            fontweight: "bold",
+            fontWeight: "bold",
             marginRight: 10,
             textDecorationLine: "underline",
           }}
@@ -152,6 +157,11 @@ const QuestionScreen = ({ navigation }) => {
               />
             </>
           )}
+          {loading&&
+<View style={{marginTop:20}}>
+  <ActivityIndicator color={'black'}/>
+</View>
+          }
           {/* {questionNumber == 5 && <></>} */}
         </ScrollView>
       </View>
@@ -174,7 +184,11 @@ const QuestionScreen = ({ navigation }) => {
               return;
             }
             if (questionNumber == 4) {
-              await updateDoc(doc(db, "users", appUser?.email), {
+              setloading(true)
+              // navigation.navigate(screens.HomeScreen);
+
+              try {
+                 await updateDoc(doc(db, "users", 'khushaal.choithramani@gmail.com'), {
                 gender,
                 sleepHours,
                 trainingHours,
@@ -186,15 +200,18 @@ const QuestionScreen = ({ navigation }) => {
                   weight,
                 },
               }).then(async () => {
-                await getUser().then(() => {
-                  // navigation.navigate(screens.Payment, { from: "signup" });
-                  navigation.navigate(screens.HomeScreen);
-                });
+                setloading(false)
+               navigation.navigate(screens.HomeScreen);
               });
+              } catch (error) {
+                Alert.alert(error)
+                 setloading(false)
+              }
+             
             }
 
             setquestionNumber(questionNumber + 1);
-            setprogressBarController(progressBarController + 0.1);
+            setprogressBarController(progressBarController + 0.3);
             console.log("Gender Selected: ", gender);
             console.log("Age Entered: ", age);
           }}
@@ -220,3 +237,6 @@ const QuestionScreen = ({ navigation }) => {
 export default QuestionScreen;
 
 const styles = StyleSheet.create({});
+
+
+// khushaal.choithramani@gmail.com

@@ -19,20 +19,20 @@ import { useStripe } from "@stripe/stripe-react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import EditProfileSheet from "../CustomComponents/EditProfileSheet";
 import CustomIcon from "../CustomIcon";
+import { useAuth, useUser } from "@clerk/clerk-expo";
+import {  deleteDoc } from "firebase/firestore";
 
 const UserProfile = ({ navigation, showUserProfile, setShowUserProfile }) => {
   const { appUser, getUser, setappUser } = useContext(AppContext);
-  const signOut = async () => {
-    await AsyncStorage.removeItem("user");
-    setappUser(null);
+  const { signOut, isSignedIn } = useAuth();
+  const signOutUser = async () => {
+    signOut();
   };
   useEffect(() => {
-    if (appUser == null) {
+    if (!isSignedIn) {
       navigation.navigate(screens.AuthScreen);
-    } else {
-      getUser();
     }
-  }, [appUser, setappUser]);
+  }, [isSignedIn]);
   const [image, setImage] = useState(appUser?.photo);
 
   const OptionsBox = ({ onClick, title, iconName }) => {
@@ -108,8 +108,39 @@ const UserProfile = ({ navigation, showUserProfile, setShowUserProfile }) => {
       </TouchableOpacity>
     );
   };
-
+  const { user } = useUser();
   const [showEditProfileSheet, setshowEditProfileSheet] = useState(false);
+
+  console.log("APpuser", appUser);
+
+  const deleteAccount =async()=>{
+
+    Alert.alert(
+      "This action is non-reversible",
+      "This action will delete your account",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        {
+          text: "OK",
+          onPress: async() =>{
+             await deleteDoc(doc(db, "users", user?.emailAddresses[0].emailAddress)).then(async()=>{
+              await signOut()
+             })
+          }
+        }
+      ],
+      { cancelable: true }
+    );
+
+
+   
+
+
+  }
   return (
     <SafeAreaView
       style={{
@@ -135,19 +166,23 @@ const UserProfile = ({ navigation, showUserProfile, setShowUserProfile }) => {
         </Text>
       </View> */}
 
-      <View style={{ alignSelf: "center", marginTop: 30 }}>
+      <View
+        style={{ alignSelf: "center", marginTop: 30, alignItems: "center" }}
+      >
         <TouchableOpacity>
-          {image ? (
+          {user?.hasImage ? (
             <Image
               style={{
                 height: 100,
                 width: 100,
                 borderRadius: 35,
               }}
-              source={{ uri: image }}
+              source={{ uri: user?.imageUrl }}
             />
           ) : (
-            <View></View>
+            <View>
+              <Ionicons name="person-outline" size={35} />
+            </View>
           )}
         </TouchableOpacity>
         <Text
@@ -158,7 +193,7 @@ const UserProfile = ({ navigation, showUserProfile, setShowUserProfile }) => {
             fontWeight: "bold",
           }}
         >
-          {appUser?.name}
+          {user?.username}
         </Text>
       </View>
 
@@ -182,22 +217,27 @@ const UserProfile = ({ navigation, showUserProfile, setShowUserProfile }) => {
           }}
           iconName={"person-outline"}
         />
-        <OptionsBox
+        {/* <OptionsBox
           iconName={"card-outline"}
           title={"Subscribe"}
           onClick={() => {
             navigation.navigate(screens.Payment);
           }}
-        />
+        /> */}
         <OptionsBox
           iconName={"lock-closed-outline"}
           title={"Sign out"}
-          onClick={signOut}
+          onClick={signOutUser}
         />
         <OptionsBox
           iconName={"stats-chart-outline"}
           title={"Track Progress"}
           onClick={() => navigation.navigate(screens.TrackProgress)}
+        />
+         <OptionsBox
+          iconName={'trash'}
+          title={"Delete Account"}
+          onClick={deleteAccount}
         />
       </View>
     </SafeAreaView>
