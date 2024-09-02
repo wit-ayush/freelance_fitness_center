@@ -18,17 +18,24 @@ import { app, db, storage } from "../../utils/firebase";
 import CustomIcon from "../CustomIcon";
 import CustomInput from "../CustomInput";
 import CustomButton from "../CustomButton";
+import { useUser } from "@clerk/clerk-expo";
 
 const EditProfileSheet = ({ modal, setModal }) => {
   const { appUser, getUser, setappUser } = useContext(AppContext);
 
+  const { user } = useUser();
+
   const [image, setImage] = useState(appUser?.photo);
-  const [userName, setuserName] = useState(appUser?.name);
+  const [userName, setuserName] = useState(user?.username);
   const [userHeight, setuserHeight] = useState(
-    appUser?.userHealthData?.height?.toString() + " cm"
+    appUser?.userHealthData?.height
+      ? appUser?.userHealthData?.height?.toString() + " cm"
+      : ""
   );
   const [userWeight, setuserWeight] = useState(
-    appUser?.userHealthData?.weight?.toString() + " kg"
+    appUser?.userHealthData?.weight
+      ? appUser?.userHealthData?.weight?.toString() + " kg"
+      : ""
   );
   const [userAge, setuserAge] = useState(appUser?.age?.toString());
 
@@ -164,7 +171,7 @@ const EditProfileSheet = ({ modal, setModal }) => {
               <CustomInput
                 label={"Email"}
                 placeholder={"Enter your Email"}
-                value={appUser?.email}
+                value={user?.emailAddresses[0].emailAddress}
                 onChangeText={setuserName}
                 editable={false}
               />

@@ -7,6 +7,7 @@ import { AppContext } from "../../context/AppContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from "../../utils/firebase";
+import { useAuth, useUser } from "@clerk/clerk-expo";
 
 const SplashScreen = ({ navigation }) => {
   const {
@@ -24,15 +25,9 @@ const SplashScreen = ({ navigation }) => {
     settrainerWorkoutLog,
   } = useContext(AppContext);
   // const navigation = useNavigation();
+  const { isSignedIn } = useAuth();
+  const { user } = useUser();
 
-  const getUser = async (email) => {
-    const docRef = doc(db, "users", email);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      await setappUser(docSnap.data());
-    }
-  };
   const getHomePromo = async () => {
     const promos: any = [];
     const querySnapshot = await getDocs(collection(db, "home"));
@@ -88,38 +83,35 @@ const SplashScreen = ({ navigation }) => {
 
   const checkUser = async () => {
     setTimeout(async () => {
-      try {
-        const jsonValue = await AsyncStorage.getItem("user");
-
-        if (jsonValue) {
-          const user = JSON.parse(jsonValue);
-          setappUser(user);
-
-          console.log("From Splash", user?.email);
-
-          // Fetch the latest user data from Firebase
-          await getUser(user.email);
-
-          // Navigate to the home screen
-          await getHomePromo();
-          await getSettings();
-          await getAllPosts();
-          await getAllWorkoutLogs();
-          await getTrainerLogs();
-          navigation.navigate("HomeStack");
-
-          return true;
-        }
-
-        // If no user data is found, navigate to the Auth screen
-        navigation.navigate(screens.AuthScreen);
-        return false;
-      } catch (e) {
-        console.log(e);
-        navigation.navigate(screens.AuthScreen);
-        return false;
-      }
+      getUser();
     }, 3000);
+  };
+
+  const getUser = async () => {
+    if (isSignedIn) {
+      const docRef = doc(db, "users", user?.emailAddresses[0]?.emailAddress);
+      const docSnap = await getDoc(docRef);
+      console.log("Doc snap", docSnap.data());
+
+      await getHomePromo();
+      await getSettings();
+      await getAllPosts();
+      await getAllWorkoutLogs();
+      await getTrainerLogs();
+
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        setappUser(userData);
+
+        if (userData != null) {
+          navigation.navigate("HomeStack");
+        }
+      } else {
+        navigation.navigate(screens.AuthScreen);
+      }
+    } else {
+      navigation.navigate(screens.AuthScreen);
+    }
   };
 
   useEffect(() => {

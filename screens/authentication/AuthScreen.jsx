@@ -6,12 +6,23 @@ import {
   Text,
   View,
 } from "react-native";
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import CustomButton from "../../components/CustomButton";
 import { screens } from "../../utils/constants";
 import { LinearGradient } from "expo-linear-gradient";
+import { useUser } from "@clerk/clerk-expo";
+import { AppContext } from "../../context/AppContext";
 
 const AuthScreen = ({ navigation }) => {
+  const { user, isSignedIn } = useUser();
+
+  const { appUser } = useContext(AppContext);
+  useEffect(() => {
+    if (isSignedIn) {
+      navigation.navigate("HomeStack");
+    }
+  }, [isSignedIn]);
+
   return (
     <View>
       <LinearGradient

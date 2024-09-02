@@ -28,7 +28,7 @@ export const screens = {
   PostScreen: "PostScreen",
 };
 
-export const Trainer_Email = "trainer@gmail.com";
+export const Trainer_Email = "Info@fit-centre.co.uk";
 
 export const images = {
   googleSignIn: require("../assets/images/google.png"),

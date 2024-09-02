@@ -21,13 +21,26 @@ import { images, screens } from "../../utils/constants";
 import SearchExercise from "../SearchExercise";
 import usePedometer from "../../hooks/usePedometer";
 import UserProfile from "./UserProfile";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from "../../utils/firebase";
 import { AppContext } from "../../context/AppContext";
 import * as MailComposer from "expo-mail-composer";
+import { useUser } from "@clerk/clerk-expo";
 
 const UserScreen = ({ navigation }) => {
   const [status, setStatus] = useState(null);
+
+  const { user } = useUser();
+
+  const { setappUser } = useContext(AppContext);
+  const getUser = async () => {
+    const docRef = doc(db, "users", user?.emailAddresses[0].emailAddress);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      setappUser(docSnap.data());
+    }
+  };
 
   const HomeCard = ({
     cardTitle,
@@ -79,7 +92,7 @@ const UserScreen = ({ navigation }) => {
 
   const handleEmailPress = () => {
     const email = "example@example.com";
-    const subject = "Hello from my app!";
+    const subject = "Hello from Fit Centre app!";
     const body = "This is the body of the email.";
 
     // Construct the mailto URL
@@ -93,21 +106,22 @@ const UserScreen = ({ navigation }) => {
     );
   };
   // const { steps, distance, flights } = useHealthData();
-  const { isPedometerAvailable, pastStepCount } = usePedometer();
+  // const { isPedometerAvailable, pastStepCount } = usePedometer();
 
   // const [promoSections, setpromoSections] = useState([]);
-  // const getHomePromo = async () => {
-  //   const promos: any = [];
-  //   const querySnapshot = await getDocs(collection(db, "home"));
-  //   querySnapshot.forEach((doc) => {
-  //     promos.push(doc.data());
-  //     console.log(doc.id, " => ", doc.data());
-  //   });
-  //   setpromoSections(promos);
-  // };
+  const getHomePromo = async () => {
+    const promos: any = [];
+    const querySnapshot = await getDocs(collection(db, "home"));
+    querySnapshot.forEach((doc) => {
+      promos.push(doc.data());
+      console.log(doc.id, " => ", doc.data());
+    });
+    setpromoSections(promos);
+  };
 
   useEffect(() => {
-    // getHomePromo();
+    getHomePromo();
+    getUser();
   }, []);
 
   const HomeSectionButton = ({ title, onPress }) => {
@@ -149,7 +163,7 @@ const UserScreen = ({ navigation }) => {
         />
         <View style={{ marginLeft: 20, marginTop: 10 }}>
           <Text style={{ fontWeight: "bold", fontSize: 20 }}>
-            Hey Khushaal, Good Morning!
+            Hey {user?.username}, Good Morning!
           </Text>
         </View>
         <Text
@@ -222,7 +236,7 @@ const UserScreen = ({ navigation }) => {
             justifyContent: "space-evenly",
           }}
         >
-          <StatComponent text={"Steps"} data={pastStepCount} />
+          <StatComponent text={"Steps"} data={0} />
           <StatComponent text={"Sleep Tracker"} data={"Coming Soon"} />
 
           {/* <StatComponent text={"Steps"} data={"Test"} /> */}

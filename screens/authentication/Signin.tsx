@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
   Platform,
+  Alert,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import CustomInput from "../../components/CustomInput";
@@ -17,11 +18,24 @@ import { AppContext } from "../../context/AppContext";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { doc, getDoc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSignIn } from "@clerk/clerk-expo";
 
 const Signin = ({ navigation }) => {
   const { appUser, setappUser } = useContext(AppContext);
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
+
+  const getUser = async (email) => {
+    const docRef = doc(db, "users", email);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      await setappUser(docSnap.data());
+      navigation.navigate("HomeStack");
+    } else {
+      Alert.alert("Error Occured");
+    }
+  };
 
   const saveCookie = async () => {
     try {
@@ -31,15 +45,35 @@ const Signin = ({ navigation }) => {
       console.log(e);
     }
   };
+  const { signIn, setActive, isLoaded } = useSignIn();
 
-  useEffect(() => {
-    if (appUser) {
-      console.log("User Found and logged in", appUser);
-      saveCookie();
-      navigation.navigate("HomeStack");
+  const onSignInPress = React.useCallback(async () => {
+    if (!isLoaded) {
+      return;
     }
-  }, [appUser]);
 
+    try {
+      const signInAttempt = await signIn.create({
+        identifier: email,
+        password,
+      });
+
+      if (signInAttempt.status === "complete") {
+        await setActive({ session: signInAttempt.createdSessionId });
+
+        await getUser(email);
+      } else {
+        Alert.alert("Invalid Email / Password");
+
+        console.error(JSON.stringify(signInAttempt, null, 2));
+      }
+    } catch (err: any) {
+      if (err.errors[0].message) {
+        Alert.alert(err.errors[0].message);
+      }
+      console.error(JSON.stringify(err, null, 2));
+    }
+  }, [isLoaded, email, password]);
   return (
     <SafeAreaView>
       <View
@@ -57,6 +91,7 @@ const Signin = ({ navigation }) => {
           Sign in
         </Text>
       </View>
+
       <View>
         <CustomInput
           label={"Email"}
@@ -70,28 +105,30 @@ const Signin = ({ navigation }) => {
           placeholder={"Enter Password"}
           value={password}
           onChangeText={setpassword}
+          isPassword
         />
         <CustomButton
           onClick={async () => {
-            await signInWithEmailAndPassword(auth, email, password)
-              .then(async (userCredential) => {
-                const user = userCredential.user;
-                const docRef = doc(db, "users", email);
-                const docSnap = await getDoc(docRef);
+            await onSignInPress();
+            // await signInWithEmailAndPassword(auth, email, password)
+            //   .then(async (userCredential) => {
+            //     const user = userCredential.user;
+            //     const docRef = doc(db, "users", email);
+            //     const docSnap = await getDoc(docRef);
 
-                if (docSnap.exists()) {
-                  await setappUser(docSnap.data());
-                  console.log("Document data:", docSnap.data());
-                } else {
-                  // docSnap.data() will be undefined in this case
-                  console.log("No such document!");
-                }
-              })
-              .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log(errorMessage);
-              });
+            //     if (docSnap.exists()) {
+            //       await setappUser(docSnap.data());
+            //       console.log("Document data:", docSnap.data());
+            //     } else {
+            //       // docSnap.data() will be undefined in this case
+            //       console.log("No such document!");
+            //     }
+            //   })
+            //   .catch((error) => {
+            //     const errorCode = error.code;
+            //     const errorMessage = error.message;
+            //     console.log(errorMessage);
+            //   });
           }}
           title={"Sign in"}
           textColor={"white"}

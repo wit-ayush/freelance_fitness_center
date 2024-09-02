@@ -9,8 +9,17 @@ import HomeStack from "./screens/home/HomeStack";
 import { StripeProvider } from "@stripe/stripe-react-native";
 import { screens } from "./utils/constants";
 import PaymentScreen from "./screens/authentication/PaymentScreen";
+import { ClerkProvider, ClerkLoaded } from "@clerk/clerk-expo";
+import * as SecureStore from "expo-secure-store";
 
 export default function App() {
+  const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+  if (!publishableKey) {
+    throw new Error(
+      "Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env"
+    );
+  }
   const Stack = createNativeStackNavigator();
 
   const tokenCache = {
@@ -31,11 +40,10 @@ export default function App() {
   };
 
   return (
-    <StripeProvider publishableKey="pk_test_51OfpGCCm75vwzAvzWZhqlCSipLrIff087TuIbTxu1qoOV9WHrOpZ1eOdcPQVBSME8SsnV539S2z0BRGJDnverNQR00nnrhkK8D">
+    <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
       <AppProvider>
         <NavigationContainer>
           <StatusBar style="auto" />
-
           <Stack.Navigator screenOptions={{ gestureEnabled: false }}>
             <Stack.Screen
               name="AuthStack"
@@ -50,7 +58,7 @@ export default function App() {
           </Stack.Navigator>
         </NavigationContainer>
       </AppProvider>
-    </StripeProvider>
+    </ClerkProvider>
   );
 }
 
