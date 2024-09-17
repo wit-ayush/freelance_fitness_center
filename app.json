@@ -47,8 +47,7 @@
           "enableGooglePay": true
         }
       ],
-      "expo-secure-store",
-      "react-native-health"
+      "expo-secure-store"
     ],
     "runtimeVersion": {
       "policy": "appVersion"
