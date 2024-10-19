@@ -105,7 +105,7 @@ const UserScreen = ({ navigation }) => {
       console.error("Error opening email client:", err)
     );
   };
-  // const { steps, distance, flights } = useHealthData();
+  
   // const { isPedometerAvailable, pastStepCount } = usePedometer();
 
   // const [promoSections, setpromoSections] = useState([]);
@@ -237,9 +237,9 @@ const UserScreen = ({ navigation }) => {
           }}
         >
           <StatComponent text={"Steps"} data={0} />
-          <StatComponent text={"Sleep Tracker"} data={"Coming Soon"} />
+          <StatComponent text={"Sleep Tracker"} data={0} />
 
-          {/* <StatComponent text={"Steps"} data={"Test"} /> */}
+          {/* <StatComponent text={"Steps"} data={"Steps"} /> */}
           {/* <StatComponent text={"Avg Calories"} data={"1670"} /> */}
         </View>
 
@@ -250,8 +250,8 @@ const UserScreen = ({ navigation }) => {
             marginTop: 20,
           }}
         >
-          <StatComponent text={"Heart Rate"} data={"Coming Soon"} />
-          <StatComponent text={"Avg Calories"} data={"Coming Soon"} />
+          <StatComponent text={"Heart Rate"} data={80} />
+          <StatComponent text={"Avg Calories"} data={100} />
         </View>
         <View style={{ height: 50 }} />
       </ScrollView>

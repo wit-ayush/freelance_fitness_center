@@ -26,8 +26,6 @@ const Inbox = ({ navigation }) => {
   const [inboxMessages, setinboxMessages] = useState<any>([]);
   const [trainerData, settrainerData] = useState<any>();
 
-  //   /test01@gmail.comtrainer@gmail.com/acht;
-
   useEffect(() => {
     getTrainer();
     getAllInChatMessages();

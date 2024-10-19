@@ -7,7 +7,6 @@ import Inbox from "./Inbox";
 import ChatScreen from "./ChatScreen";
 
 import ExerciseSearch from "../workoutscreens/ExerciseSearch";
-import PaymentScreen from "../authentication/PaymentScreen";
 import PaymentConfirmation from "../authentication/PaymentConfirmation";
 import PlanDetails from "./PlanDetails";
 import AddWorkouts from "./AddWorkouts";
@@ -42,11 +41,6 @@ const HomeStack = () => {
       <Stack.Screen
         name={screens.ExerciseSearch}
         component={ExerciseSearch}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name={screens.Payment}
-        component={PaymentScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

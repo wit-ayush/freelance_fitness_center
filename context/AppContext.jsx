@@ -9,7 +9,7 @@ export const AppContext = createContext();
 const AppProvider = ({ children }) => {
   const [allPosts, setallPosts] = useState([]);
 
-  const [appUser, setappUser] = useState(null);
+  const [appUser, setAppUser] = useState(null);
   const [isTrainer, setisTrainer] = useState("");
   const [trainerData, settrainerData] = useState();
   const [userWorkoutLog, setuserWorkoutLog] = useState([]);
@@ -29,7 +29,7 @@ const AppProvider = ({ children }) => {
       await saveCookie();
 
       if (docSnap.exists()) {
-        await setappUser(docSnap.data());
+        await setAppUser(docSnap.data());
       }
     }
   };
@@ -69,7 +69,7 @@ const AppProvider = ({ children }) => {
     <AppContext.Provider
       value={{
         appUser,
-        setappUser,
+        setAppUser,
         isTrainer,
         trainerData,
         checkTrainer,

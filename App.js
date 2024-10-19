@@ -7,7 +7,6 @@ import AuthStack from "./screens/authentication/AuthStack";
 import AppProvider from "./context/AppContext";
 import HomeStack from "./screens/home/HomeStack";
 import { screens } from "./utils/constants";
-// import PaymentScreen from "./screens/authentication/PaymentScreen";
 import { ClerkProvider, ClerkLoaded } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
 

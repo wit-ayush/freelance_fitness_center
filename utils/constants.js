@@ -15,7 +15,6 @@ export const screens = {
   UserProfile: "UserProfile",
   TrainerHome: "TrainerHome",
   ExerciseSearch: "ExerciseSearch",
-  Payment: "PaymentScreen",
   PaymentConfirm: "PaymentConfirm",
   PlanDetails: "PlanDetails",
   AddWorkouts: "AddWorkouts",

@@ -69,7 +69,7 @@ const Signup = ({ navigation }) => {
           }
         })
         .catch((e) => {
-          alert(e.message);
+          alert("error" + e.message);
         });
 
       console.log("Document written with ID: ", userDocRef.id);
@@ -205,8 +205,8 @@ const Signup = ({ navigation }) => {
                 onChangeText={setEmail}
               />
               <CustomInput
-                label={"Full Name"}
-                placeholder={"Enter Full Name"}
+                label={"Username"}
+                placeholder={"Enter Username"}
                 value={name}
                 onChangeText={setName}
               />
